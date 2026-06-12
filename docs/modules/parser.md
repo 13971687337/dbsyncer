@@ -110,7 +110,7 @@ dbsyncer.parser.table.group.buffer-period-millisecond=300
 
 ## 数据转换（Convert）
 
-位于 `parser/convert/`，提供 18 种数据转换 Handler：
+位于 `parser/convert/`，提供 20 种数据转换 Handler：
 
 | Handler | 功能 |
 |---------|------|

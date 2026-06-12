@@ -39,6 +39,7 @@ public class DiskStorageService extends AbstractStorageService {
 | `CONFIG` | 连接器配置、映射配置、系统配置、用户配置 | 全局配置 |
 | `DATA` | 同步数据记录、断点信息、增量位点 | 按 metaId 分目录 |
 | `LOG` | 同步日志、系统日志 | 全局日志 |
+| `TASK_DATA_VERIFICATION_DETAIL` | 任务数据校验详情 | 数据校验记录 |
 
 ## 查询体系
 
