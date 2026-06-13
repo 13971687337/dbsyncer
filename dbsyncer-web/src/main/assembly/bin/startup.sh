@@ -40,17 +40,15 @@ if [ -e "$DBS_HOME/bin/$ENCRYPT_FILE" ]; then
   SERVER_OPTS="$SERVER_OPTS -agentpath:$DBS_HOME/bin/$ENCRYPT_FILE"
 fi
 SERVER_OPTS="$SERVER_OPTS \
--Djava.ext.dirs=$JAVA_HOME/jre/lib/ext:$DBS_HOME/lib \
 -Dspring.config.location=$CONFIG_PATH \
 -DLOG_HOME=$DBS_HOME/logs \
 -Dsun.stdout.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.dir=$DBS_HOME \
--XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 \
--XX:+CMSClassUnloadingEnabled -XX:+DisableExplicitGC -XX:+UseCMSInitiatingOccupancyOnly \
--XX:CMSInitiatingOccupancyFraction=68 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps \
+-XX:ParallelGCThreads=4 -XX:+DisableExplicitGC \
+-Xlog:gc*:file=$DBS_HOME/logs/gc_%p.log:time,level,tags \
 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$DBS_HOME/logs -XX:ErrorFile=$DBS_HOME/logs/hs_err_pid_%p.log"
 
 # execute command
 echo $SERVER_OPTS
-java $SERVER_OPTS $APP > /dev/null & echo $! > $DBS_HOME/tmp.pid
+java $SERVER_OPTS -cp "$DBS_HOME/lib/*" $APP > /dev/null & echo $! > $DBS_HOME/tmp.pid
 echo 'Start successfully!'
 exit 1
