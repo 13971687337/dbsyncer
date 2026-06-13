@@ -37,7 +37,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, Disposabl
     @Override
     public void start(String key, String cron, ScheduledTaskJob job) {
         logger.info("[{}], Started task [{}]", cron, job.getClass().getSimpleName());
-        apply(key, () -> taskScheduler.schedule(job, (trigger) -> new CronTrigger(cron).nextExecutionTime(trigger)));
+        apply(key, () -> taskScheduler.schedule(job, new CronTrigger(cron)));
     }
 
     @Override

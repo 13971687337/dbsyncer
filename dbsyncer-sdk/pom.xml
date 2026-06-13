@@ -29,5 +29,12 @@
             <artifactId>jsqlparser</artifactId>
         </dependency>
 
+        <!-- HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>6.2.1</version>
+        </dependency>
+
     </dependencies>
 </project>

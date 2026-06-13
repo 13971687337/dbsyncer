@@ -1,6 +1,5 @@
 package org.dbsyncer.plugin.impl;
 
-import com.sun.mail.util.MailSSLSocketFactory;
 import org.dbsyncer.common.config.AppConfig;
 import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.plugin.model.NotifyMessage;
@@ -14,13 +13,13 @@ import org.springframework.util.Assert;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Properties;
@@ -65,10 +64,8 @@ public final class MailNotifyServiceProvider implements NotifyService {
             props.put("mail.smtp.host", "smtp.qq.com");
             props.put("mail.user", username);
             props.put("mail.password", password);
-            MailSSLSocketFactory sf = new MailSSLSocketFactory();
-            sf.setTrustAllHosts(true);
             props.put("mail.smtp.ssl.enable", "true");
-            props.put("mail.smtp.ssl.socketFactory", sf);
+            props.put("mail.smtp.ssl.trust", "*");
             // 构建授权信息，用于进行SMTP身份验证
             session = Session.getInstance(props, new Authenticator() {
                 @Override
@@ -76,7 +73,7 @@ public final class MailNotifyServiceProvider implements NotifyService {
                     return new PasswordAuthentication(username, password);
                 }
             });
-        } catch (GeneralSecurityException e) {
+        } catch (Exception e) {
             logger.error("MailNotifyServiceProvider init error!", e);
         }
     }

@@ -1694,6 +1694,29 @@ public class DatabaseTemplate implements JdbcOperations {
         public Stream<T> stream() {
             return StreamSupport.stream(this, false);
         }
-    }
+        }
 
+    @Override
+    public int[] batchUpdate(PreparedStatementCreator psc, BatchPreparedStatementSetter bpss, KeyHolder generatedKeyHolder) throws DataAccessException {
+        return execute(psc, (PreparedStatementCallback<int[]>) ps -> {
+            int batchSize = bpss.getBatchSize();
+            if (JdbcUtils.supportsBatchUpdates(ps.getConnection())) {
+                for (int i = 0; i < batchSize; i++) {
+                    bpss.setValues(ps, i);
+                    ps.addBatch();
+                }
+                return ps.executeBatch();
+            }
+            List<Integer> rowsAffected = new ArrayList<>();
+            for (int i = 0; i < batchSize; i++) {
+                bpss.setValues(ps, i);
+                rowsAffected.add(ps.executeUpdate());
+            }
+            int[] rowsAffectedArray = new int[rowsAffected.size()];
+            for (int i = 0; i < rowsAffectedArray.length; i++) {
+                rowsAffectedArray[i] = rowsAffected.get(i);
+            }
+            return rowsAffectedArray;
+        });
+    }
 }
