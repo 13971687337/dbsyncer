@@ -4,8 +4,8 @@
 package org.dbsyncer.common.util;
 
 import org.dbsyncer.common.util.DataChunkUtil.DataChunk;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

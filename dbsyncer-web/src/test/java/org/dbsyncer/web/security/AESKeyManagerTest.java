@@ -3,10 +3,10 @@
  */
 package org.dbsyncer.web.security;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +22,13 @@ public class AESKeyManagerTest {
     
     private static final String TEST_APP_ID = "test-app-001";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // 初始化缓存清理任务
         AESKeyManager.init();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // 清理测试数据
         AESKeyManager.removeKey(TEST_APP_ID);

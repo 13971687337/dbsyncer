@@ -32,9 +32,9 @@ import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class ESClientTest {
     private String indexName = "test_index";
     private String type = "_doc";
 
-    @Before
+    @BeforeEach
     public void init() {
         ESConfig config = new ESConfig();
         config.setUrl("https://127.0.0.1:9200");
@@ -71,7 +71,7 @@ public class ESClientTest {
         }
     }
 
-    @After
+    @AfterEach
     public void close() {
         ESUtil.close(client);
     }

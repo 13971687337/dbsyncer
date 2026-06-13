@@ -5,7 +5,7 @@ import com.github.shyiko.mysql.binlog.event.*;
 import org.dbsyncer.sdk.constant.ConnectorConstant;
 import org.dbsyncer.connector.mysql.binlog.BinaryLogClient;
 import org.dbsyncer.connector.mysql.binlog.BinaryLogRemoteClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

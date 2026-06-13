@@ -3,10 +3,10 @@
  */
 package org.dbsyncer.web.security;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +22,14 @@ public class ExpiringCacheTest {
     
     private ExpiringCache<String, String> cache;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // 创建缓存：默认过期时间1秒，清理间隔500毫秒
         cache = new ExpiringCache<>(1000L, 500L);
         cache.init();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (cache != null) {
             cache.destroy();

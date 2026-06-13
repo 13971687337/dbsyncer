@@ -1,7 +1,7 @@
 /**
  * DBSyncer Copyright 2020-2025 All Rights Reserved.
  */
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ByteOrderValues;
 import org.locationtech.jts.io.ParseException;

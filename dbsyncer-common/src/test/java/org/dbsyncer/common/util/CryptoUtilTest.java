@@ -4,9 +4,9 @@
 package org.dbsyncer.common.util;
 
 import org.dbsyncer.common.model.RSAConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public class CryptoUtilTest {
     private RSAConfig rsaConfig;
     private Map<String, Object> testData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // 生成RSA密钥对
         rsaConfig = RSAUtil.createKeys(2048);

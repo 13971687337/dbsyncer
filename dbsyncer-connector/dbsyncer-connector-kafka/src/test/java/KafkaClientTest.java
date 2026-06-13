@@ -15,9 +15,9 @@ import org.dbsyncer.connector.kafka.config.KafkaConfig;
 import org.dbsyncer.connector.kafka.util.KafkaUtil;
 import org.dbsyncer.sdk.enums.DataTypeEnum;
 import org.dbsyncer.sdk.model.Field;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class KafkaClientTest {
     private final String topic = "my_topic";
     private final String groupId = "my_group";
 
-    @Before
+    @BeforeEach
     public void init() {
         KafkaConfig config = new KafkaConfig();
         config.setUrl("127.0.0.1:9092");
@@ -84,7 +84,7 @@ public class KafkaClientTest {
 //        consumer = instance.getConsumer(topic, groupId);
     }
 
-    @After
+    @AfterEach
     public void close() {
         if (consumer != null) {
             consumer.close();

@@ -48,9 +48,9 @@ import org.dbsyncer.storage.lucene.Option;
 import org.dbsyncer.storage.lucene.Shard;
 import org.dbsyncer.storage.util.BinlogMessageUtil;
 import org.dbsyncer.storage.util.DocumentUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,12 +76,12 @@ public class LuceneFactoryTest {
 
     private SnowflakeIdWorker snowflakeIdWorker = new SnowflakeIdWorker();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         shard = new Shard("target/indexDir/");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         shard.deleteAll();
     }

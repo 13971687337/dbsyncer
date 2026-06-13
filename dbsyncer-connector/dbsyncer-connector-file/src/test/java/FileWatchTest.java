@@ -1,6 +1,6 @@
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class FileWatchTest {
     private String path = "d:/test/";
     private WatchService watchService;
 
-    @After
+    @AfterEach
     public void close() throws IOException {
         if (null != watchService) {
             watchService.close();
