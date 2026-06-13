@@ -21,7 +21,7 @@
 
 ### 1. HTML 结构
 
-在输入框上添加 `data-role="tagsinput"` 属性：
+在输入框上添加 `data-role="tagsinput"` 属性：ab
 
 ```html
 <!-- 基本用法 -->

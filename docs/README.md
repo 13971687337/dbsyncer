@@ -1,4 +1,4 @@
-# DBSyncer 技术文档
+zh# DBSyncer 技术文档
 
 DBSyncer v2.0.8 — 开源数据同步中间件，支持 MySQL、Oracle、SqlServer、PostgreSQL、Elasticsearch、Kafka、File、SQLite 之间的全量与增量同步。
 

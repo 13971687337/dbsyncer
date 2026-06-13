@@ -57,21 +57,23 @@
 
     <!-- 镜像仓库地址 -->
     <repositories>
-        <!-- DataNucleus仓库 -->
-        <repository>
-            <id>datanucleus</id>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-        </repository>
-
         <!-- 阿里云仓库 -->
         <repository>
             <id>ali</id>
             <name>ali Repository</name>
-            <url>https://maven.aliyun.com/repository/google</url>
+            <url>https://maven.aliyun.com/repository/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+        <!-- DataNucleus仓库 (offline) -->
+        <!--
+        <repository>
+            <id>datanucleus</id>
+            <url>http://www.datanucleus.org/downloads/maven2/</url>
+        </repository>
+        -->
 
         <!-- atlassian仓库 -->
         <repository>
