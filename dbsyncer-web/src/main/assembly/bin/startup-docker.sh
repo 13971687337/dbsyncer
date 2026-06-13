@@ -53,7 +53,7 @@ fi
 
 SERVER_OPTS="$SERVER_OPTS \
 -Dspring.config.location=$CONFIG_PATH \
--DLOG_HOME=$DBS_HOME/logs \
+-DlogPath=$DBS_HOME/logs \
 -Dsun.stdout.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.dir=$DBS_HOME \
 -XX:ParallelGCThreads=4 -XX:+DisableExplicitGC \
 -Xlog:gc*:file=$DBS_HOME/logs/gc_%p.log:time,level,tags \

@@ -4,8 +4,8 @@
 <configuration status="WARN" monitorInterval="30">
 
     <Properties>
-        <!-- LOG_HOME: Docker环境下必须通过 -DLOG_HOME 系统属性设置绝对路径，否则使用相对路径 logs -->
-        <Property name="LOG_HOME">${sys:LOG_HOME:-logs}</Property>
+        <!-- logPath: 可通过 -DlogPath 系统属性设置绝对路径，否则使用相对路径 logs -->
+        <Property name="logPath">${sys:logPath:-logs}</Property>
         <!-- 日志输出格式 -->
         <property name="LOG_PATTERN" value="%d{HH:mm:ss:SSS} [%thread] [%p] - %c{1.} %M:%L - %m%n" />
     </Properties>
@@ -21,8 +21,8 @@
 
         <!-- 这个输出到文件的配置,这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <!-- Info Log -->
-        <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/info.log"
-                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileInfo" fileName="${logPath}/info.log"
+                     filePattern="${logPath}/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
@@ -35,8 +35,8 @@
         </RollingFile>
 
         <!-- Warn Log -->
-        <RollingFile name="RollingFileWarn" fileName="${LOG_HOME}/warn.log"
-                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileWarn" fileName="${logPath}/warn.log"
+                     filePattern="${logPath}/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
@@ -47,8 +47,8 @@
         </RollingFile>
 
         <!-- Error Log -->
-        <RollingFile name="RollingFileError" fileName="${LOG_HOME}/error.log"
-                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileError" fileName="${logPath}/error.log"
+                     filePattern="${logPath}/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
