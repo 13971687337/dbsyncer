@@ -19,12 +19,14 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- dbsyncer-connector-elasticsearch -->
+        <!-- dbsyncer-connector-elasticsearch (P2: JDK 21 incompatible, migrate to elasticsearch-java) -->
+        <!--
         <dependency>
             <groupId>org.ghi</groupId>
             <artifactId>dbsyncer-connector-elasticsearch</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        -->
 
         <!-- dbsyncer-connector-file -->
         <dependency>

@@ -44,10 +44,10 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
     }
 
     public <T> T execute(HandleCallback callback) {
-        Connection connection = null;
+        SimpleConnection connection = null;
         try {
-            connection = getConnection();
-            return (T) callback.apply(new DatabaseTemplate((SimpleConnection) connection));
+            connection = getSimpleConnection();
+            return (T) callback.apply(new DatabaseTemplate(connection));
         } catch (EmptyResultDataAccessException e) {
             throw e;
         } catch (Exception e) {
@@ -79,10 +79,12 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
         this.config = config;
     }
 
-    @Override
-    public Connection getConnection() throws Exception {
+    private boolean isOracleDriver() {
+        return config.getDriverClassName() != null && config.getDriverClassName().contains("OracleDriver");
+    }
+
+    public SimpleConnection getSimpleConnection() throws Exception {
         Connection connection = dataSource.getConnection();
-        // 动态设置数据库和模式
         try {
             if (StringUtil.isNotBlank(catalog)) {
                 connection.setCatalog(catalog);
@@ -92,9 +94,13 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
             }
         } catch (SQLException e) {
             logger.warn("Failed to set catalog/schema: {}", e.getMessage());
-            // 不抛出异常，允许连接继续使用
         }
-        return connection;
+        return new SimpleConnection(connection, isOracleDriver());
+    }
+
+    @Override
+    public Connection getConnection() throws Exception {
+        return getSimpleConnection();
     }
 
     @Override

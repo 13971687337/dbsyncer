@@ -16,8 +16,12 @@ public final class HikariDataSourceFactory {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(config.getUrl());
         hikariConfig.setUsername(config.getUsername());
-        hikariConfig.setPassword(config.getPassword());
-        hikariConfig.setDriverClassName(config.getDriverClassName());
+        if (config.getPassword() != null) {
+            hikariConfig.setPassword(config.getPassword());
+        }
+        if (config.getDriverClassName() != null) {
+            hikariConfig.setDriverClassName(config.getDriverClassName());
+        }
         hikariConfig.setMaximumPoolSize(config.getMaxActive());
         hikariConfig.setMinimumIdle(Math.min(config.getMaxActive() / 4, 10));
         hikariConfig.setConnectionTimeout(30000);
