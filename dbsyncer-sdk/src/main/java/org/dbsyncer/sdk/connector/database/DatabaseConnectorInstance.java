@@ -7,8 +7,8 @@ import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.sdk.SdkException;
 import org.dbsyncer.sdk.config.DatabaseConfig;
 import org.dbsyncer.sdk.connector.ConnectorInstance;
+import org.dbsyncer.sdk.connector.database.ds.HikariDataSourceFactory;
 import org.dbsyncer.sdk.connector.database.ds.SimpleConnection;
-import org.dbsyncer.sdk.connector.database.ds.SimpleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,7 +20,7 @@ import java.util.Properties;
 public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConfig, Connection> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private DatabaseConfig config;
-    private final SimpleDataSource dataSource;
+    private final javax.sql.DataSource dataSource;
     private final String catalog;
     private final String schema;
 
@@ -40,7 +40,7 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
         if (StringUtil.isNotBlank(config.getPassword())) {
             properties.put("password", config.getPassword());
         }
-        this.dataSource = new SimpleDataSource(config.getDriverClassName(), config.getUrl(), properties, config.getMaxActive(), config.getKeepAlive());
+        this.dataSource = HikariDataSourceFactory.create(config);
     }
 
     public <T> T execute(HandleCallback callback) {
@@ -54,7 +54,13 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
             logger.error(e.getMessage());
             throw new SdkException(e.getMessage(), e.getCause());
         } finally {
-            dataSource.close(connection);
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    logger.warn("Failed to close connection: {}", e.getMessage());
+                }
+            }
         }
     }
 
@@ -77,29 +83,32 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
     public Connection getConnection() throws Exception {
         Connection connection = dataSource.getConnection();
         // 动态设置数据库和模式
-        if (connection instanceof SimpleConnection) {
-            SimpleConnection simpleConnection = (SimpleConnection) connection;
-            try {
-                if (StringUtil.isNotBlank(catalog)) {
-                    simpleConnection.setCatalog(catalog);
-                }
-                if (StringUtil.isNotBlank(schema)) {
-                    simpleConnection.setSchema(schema);
-                }
-            } catch (SQLException e) {
-                logger.warn("Failed to set catalog/schema: {}", e.getMessage());
-                // 不抛出异常，允许连接继续使用
+        try {
+            if (StringUtil.isNotBlank(catalog)) {
+                connection.setCatalog(catalog);
             }
+            if (StringUtil.isNotBlank(schema)) {
+                connection.setSchema(schema);
+            }
+        } catch (SQLException e) {
+            logger.warn("Failed to set catalog/schema: {}", e.getMessage());
+            // 不抛出异常，允许连接继续使用
         }
         return connection;
     }
 
     @Override
     public void close() {
-        dataSource.close();
+        if (dataSource instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable) dataSource).close();
+            } catch (Exception e) {
+                logger.warn("Failed to close data source: {}", e.getMessage());
+            }
+        }
     }
 
-    public SimpleDataSource getDataSource() {
+    public javax.sql.DataSource getDataSource() {
         return dataSource;
     }
 
