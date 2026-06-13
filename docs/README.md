@@ -7,7 +7,8 @@ DBSyncer v2.0.8 — 开源数据同步中间件，支持 MySQL、Oracle、SqlSer
 | 文档 | 类型 | 说明 |
 |------|------|------|
 | [architecture.md](architecture.md) | 架构总览 | 系统架构设计、分层模型、技术选型 |
-| [sync-pipeline.md](sync-pipeline.md) | 深度分析 | 全量+增量同步管线、多任务并发模型 |
+| [sync-pipeline.md](sync-pipeline.md) | 深度分析 | 全量+增量同步管线、CDC方案、多任务并发模型 |
+| [performance.md](performance.md) | 性能指南 | 瓶颈分析、优化方案、配置调优速查表 |
 | [deployment.md](deployment.md) | 部署配置 | 安装、启动、配置参数、性能调优 |
 | [plugin-dev.md](plugin-dev.md) | 插件开发 | 自定义连接器、自定义转换插件开发指南 |
 | [modules/sdk.md](modules/sdk.md) | 模块参考 | SDK 层：SPI、连接器接口、存储抽象、Schema |
