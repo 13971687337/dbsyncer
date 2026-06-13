@@ -4,18 +4,18 @@
 
 ## 源码路标
 
-| 组件 | 文件 |
-|------|------|
-| 全量拉取器 | `dbsyncer-manager/.../manager/impl/FullPuller.java` |
-| 增量拉取器 | `dbsyncer-manager/.../manager/impl/IncrementPuller.java` |
-| 全量同步引擎 | `dbsyncer-parser/.../parser/impl/ParserComponentImpl.java` |
-| 缓存执行器基类 | `dbsyncer-parser/.../parser/flush/AbstractBufferActuator.java` |
-| 通用执行器 | `dbsyncer-parser/.../parser/flush/impl/GeneralBufferActuator.java` |
+| 组件 | 文件                                                                    |
+|------|-----------------------------------------------------------------------|
+| 全量拉取器 | `dbsyncer-manager/.../manager/impl/FullPuller.java`                   |
+| 增量拉取器 | `dbsyncer-manager/.../manager/impl/IncremenzengtPuller.java`          |
+| 全量同步引擎 | `dbsyncer-parser/.../parser/impl/ParserComponentImpl.java`            |
+| 缓存执行器基类 | `dbsyncer-parser/.../parser/flush/AbstractBufferActuator.java`        |
+| 通用执行器 | `dbsyncer-parser/.../parser/flush/impl/GeneralBufferActuator.java`    |
 | 表级执行器 | `dbsyncer-parser/.../parser/flush/impl/TableGroupBufferActuator.java` |
-| 执行器路由 | `dbsyncer-parser/.../parser/flush/impl/BufferActuatorRouter.java` |
-| 事件消费者 | `dbsyncer-parser/.../parser/consumer/ParserConsumer.java` |
-| 任务生命周期 | `dbsyncer-manager/.../manager/ManagerFactory.java` |
-| 持久化策略 | `dbsyncer-parser/.../parser/strategy/FlushStrategy.java` |
+| 执行器路由 | `dbsyncer-parser/.../parser/flush/impl/BufferActuatorRouter.java`     |
+| 事件消费者 | `dbsyncer-parser/.../parser/consumer/ParserConsumer.java`             |
+| 任务生命周期 | `dbsyncer-manager/.../manager/ManagerFactory.java`                    |
+| 持久化策略 | `dbsyncer-parser/.../parser/strategy/FlushStrategy.java`              |
 
 ---
 
@@ -98,11 +98,161 @@ while (i < list.size()) {
 
 ---
 
-## 二、增量同步
+## 二、增量同步 — CDC 方案总览
+
+DBSyncer 为不同数据库实现了不同的 CDC（Change Data Capture）策略。`ListenerTypeEnum` 区分两种监听模式：
+
+- **LOG（日志解析型 CDC）**：直接读取数据库事务日志，实时捕获变更，延迟低
+- **TIMING（定时轮询型）**：通过定时任务检查时间戳/版本号字段，有轮询间隔延迟
+
+| 连接器 | CDC 方案 | 监听类型 | Listenr 实现 | 位点机制 |
+|--------|----------|----------|-------------|----------|
+| **MySQL** | Binlog 流式解析 | LOG | `MySQLListener` (`connector/mysql/cdc/`) | `(binlogFilename, position)` |
+| **PostgreSQL** | Logical Replication + Replication Slot | LOG | `PostgreSQLListener` (`connector/postgresql/cdc/`) | `LogSequenceNumber (LSN)` |
+| **SQL Server** | Agent CDC (`sys.sp_cdc_*`) | LOG | `SqlServerListener` (`connector/sqlserver/cdc/`) | `LSN (Log Sequence Number)` |
+| **Oracle** | LogMiner (Redo Log 解析) | LOG | `OracleListener` (`connector/oracle/cdc/`) | `SCN (System Change Number)` |
+| **Elasticsearch** | 定时轮询（Quartz） | TIMING | `ESQuartzListener` (`connector/elasticsearch/cdc/`) | 基于时间戳/自增 ID |
+| **File** | 文件系统 WatchService | TIMING | `FileListener` (`connector/file/cdc/`) | 文件修改事件 |
+
+### MySQL — Binlog CDC
+
+`MySQLListener.java:58` 继承 `AbstractDatabaseListener`，基于 `com.github.shyiko.mysql.binlog` 库（`mysql-binlog-connector-java 0.30.1`）。
+
+**连接建立** (line 108-123)：
+```java
+client = new BinaryLogRemoteClient(host, port, username, password);
+client.setBinlogFilename(snapshot.get("fileName"));    // 从断点恢复
+client.setBinlogPosition(Long.parseLong(snapshot.get("position")));
+client.registerEventListener(new InnerEventListener());
+client.connect();
+```
+
+**Binlog 事件处理** (`InnerEventListener.onEvent`, line 203)：单线程顺序消费，处理 WRITE_ROWS / UPDATE_ROWS / DELETE_ROWS / QUERY(DDL) / ROTATE / XID：
+
+```
+EventType.WRITE_ROWS  → new RowChangedEvent(..., "INSERT", afterRow, fileName, position)
+EventType.UPDATE_ROWS → new RowChangedEvent(..., "UPDATE", afterRow, fileName, position)
+EventType.DELETE_ROWS → new RowChangedEvent(..., "DELETE", beforeRow, fileName, position)
+EventType.QUERY       → parseDDL(data) → DDLChangedEvent (ALTER TABLE only)
+EventType.XID         → refresh(position) — 事务提交时更新位点
+EventType.ROTATE      → refresh(newFileName, position) — binlog 切换时更新位点
+```
+
+**反压控制** (`trySendEvent`, line 145)：当 `BufferActuator` 队列满时，Binlog 消费线程阻塞等待 1ms 重试，直到队列有空位。`MySQLListener` 还有 `notUniqueCodeEvent` 过滤——跳过 DBSyncer 自身写入的数据（通过 SQL 前缀 `DBS_UNIQUE_CODE` 识别），避免循环同步。
+
+**断点恢复**：位点 `(binlogFilename, position)` 持久化在 `snapshot` Map 中，由 `IncrementPuller.run()` 每 3 秒调用 `Listener.flushEvent()` 写入 `Meta.snapshot`。重启后从上次 binlog 位点继续消费。
+
+### PostgreSQL — Logical Replication CDC
+
+`PostgreSQLListener.java:45` 继承 `AbstractDatabaseListener`，使用 PostgreSQL 9.4+ 的逻辑复制功能。
+
+**前置校验** (line 78-94)：
+```java
+// 1. 检查 wal_level 必须是 logical
+GET_WAL_LEVEL → "SHOW WAL_LEVEL"
+// 2. 检查用户权限（LOGIN + REPLICATION/SUPERUSER/ADMIN/RDS_ADMIN）
+GET_ROLE → "SELECT rolcanlogin, rolreplication FROM pg_roles WHERE rolname = current_user"
+```
+
+**Replication Slot 管理** (line 174-199)：
+```java
+// 1. 检查 slot 是否存在
+"SELECT count(1) FROM pg_replication_slots WHERE slot_name = ? AND plugin = ?"
+// 2. 不存在则创建
+pgConnection.getReplicationAPI().createReplicationSlot()
+    .logical().withSlotName(slotName).withOutputPlugin(plugin).make();
+// 3. 获取起始 LSN
+startLsn = LogSequenceNumber.valueOf(snapshot.get("position"));
+```
+
+**解码插件**：通过 `MessageDecoderEnum` 支持两种插件：
+- `pgoutput`：PostgreSQL 内置（PG 10+），`PgOutputMessageDecoder`
+- `test_decoding`：PG 自带简单解码器，`TestDecodingMessageDecoder`
+
+**消费循环** (`Worker.run`, line 266-316)：
+```java
+// 非阻塞读取 WAL 消息
+ByteBuffer msg = stream.readPending();  // line 273
+RowChangedEvent event = messageDecoder.processMessage(msg);  // line 286
+sendChangedEvent(event);  // 发送到 BufferActuator
+// 反馈 LSN 确认
+stream.setAppliedLSN(lsn);
+stream.setFlushedLSN(lsn);
+stream.forceUpdateStatus();  // 更新复制槽位点
+```
+
+**自动恢复** (`recover()`, line 239-264)：连接断开后自动重连——关闭旧 stream/connection → 阻塞直到重新建立连接 → 从上次确认的 LSN 继续消费。
+
+**Slot 清理** (`dropReplicationSlot`, line 202-237)：默认关闭时删除 replication slot（`dropSlotOnClose=true`），3 次重试处理 `OBJECT_IN_USE` 状态。
+
+### SQL Server — Agent CDC
+
+`SqlServerListener.java:46` 继承 `AbstractDatabaseListener`，使用 SQL Server 2008+ 的 Change Data Capture 功能。要求 SQL Server Agent 运行。
+
+**CDC 启用** (line 216-227)：
+```sql
+-- 1. 启用数据库 CDC
+EXEC sys.sp_cdc_enable_db
+-- 2. 为每个表启用 CDC
+EXEC sys.sp_cdc_enable_table @source_schema = 'dbo', @source_name = '{table}'
+-- 3. 读取变更捕获实例
+EXEC sys.sp_cdc_help_change_data_capture
+```
+
+**LSN 拉取** (`LsnPuller`)：SQL Server CDC 依赖 `LsnPuller` 定期获取最大 LSN (`sys.fn_cdc_get_max_lsn()`)，通过 `pushStopLsn(Lsn)` 推送到监听器的阻塞队列（`BlockingQueue<Lsn>`, 容量 256）。
+
+**变更查询** (`pull`, line 241-271)：
+```sql
+-- 从上次 LSN 到当前 LSN 的所有变更
+SELECT * FROM cdc.[fn_cdc_get_all_changes_{captureInstance}](startLsn, stopLsn, 'all update old')
+ORDER BY [__$start_lsn] ASC, [__$seqval] ASC
+```
+
+操作码映射（`TableOperationEnum`）：1=DELETE, 2=INSERT, 3=UPDATE_BEFORE(跳过), 4=UPDATE_AFTER。
+
+**消费循环** (`Worker.run`, line 365-394)：
+```java
+Lsn stopLsn = buffer.take();         // 阻塞获取最新 LSN
+while ((poll = buffer.poll()) != null) stopLsn = poll;  // 取最新
+pull(stopLsn);                        // 拉取 startLsn→stopLsn 的变更
+lastLsn = stopLsn;                    // 推进位点
+```
+
+### Oracle — LogMiner CDC
+
+`OracleListener.java:43` 继承 `AbstractDatabaseListener`，使用 Oracle LogMiner 解析 Redo Log。
+
+```java
+LogMiner logMiner = new LogMiner(username, password, url, schema, driverClassName);
+logMiner.setStartScn(containsPos ? Long.parseLong(snapshot.get("position")) : 0);
+logMiner.registerEventListener((event) -> parseEvent(event));
+logMiner.start();
+```
+
+位点机制：SCN (System Change Number)。核心类：`LogMiner`, `LogMinerHelper`, `RedoEvent`, `TransactionalBuffer`（事务缓冲）。SQL 解析器：`InsertSql`, `UpdateSql`, `DeleteSql`。
+
+### Elasticsearch — 定时轮询（非 CDC）
+
+`ESQuartzListener.java:31` 继承 `AbstractQuartzListener`（定时监听基类，非 `AbstractDatabaseListener`）。ES 不支持事务日志，通过定时检查时间戳/自增 ID 等系统参数实现伪增量。
+
+### File — 文件系统监控（非 CDC）
+
+`FileListener` 继承 `AbstractListener`，使用 Java NIO `WatchService` 监听文件目录的 `ENTRY_MODIFY` 事件，实现文件变更检测。
+
+### CDC 一致性保证
+
+所有 CDC Listener 继承 `AbstractDatabaseListener`，共享以下机制：
+
+1. **幂等过滤**：`isFilterTable(database, table)` 确保只处理已配置的表的变更
+2. **循环同步防护**：MySQL 通过 `DBS_UNIQUE_CODE` 过滤自身写入，PG/SQLServer/Oracle 通过 schema 隔离
+3. **位点原子更新**：Listener → `snapshot` Map → `IncrementPuller.flushEvent()` (每 3s) → `Meta.snapshot` → Lucene 持久化
+4. **异常恢复**：消费线程异常时自动重试或重连，位点不丢失
+
+## 三、增量同步管线（通用流程）
 
 `IncrementPuller` (`IncrementPuller.java:63`)，三条并行时间线。
 
-### 2.1 启动线
+### 3.1 启动线
 
 ```
 IncrementPuller.start(mapping)                              [line 96]
@@ -115,7 +265,7 @@ IncrementPuller.start(mapping)                              [line 96]
             └─ listener.start()                                [line 118]
 ```
 
-### 2.2 数据变更线（热路径）
+### 3.2 数据变更线（热路径）
 
 `ParserConsumer` (`consumer/ParserConsumer.java:26`) 是 Listener 和 BufferActuator 之间的桥：
 
@@ -128,7 +278,7 @@ Listener (MySQL Binlog / PG Replication / Quartz 定时轮询)
         └── 无表级路由 → 降级到 GeneralBufferActuator → offer(event)
 ```
 
-### 2.3 定时消费线（批量冲洗）
+### 3.3 定时消费线（批量冲洗）
 
 `AbstractBufferActuator` 构造时注册定时任务 (`AbstractBufferActuator.java:77`)：
 
@@ -168,7 +318,7 @@ pull(response)
 
 ---
 
-## 三、多任务并发模型
+## 四、多任务并发模型
 
 系统通过**三层隔离**实现多任务并行执行。
 
@@ -261,7 +411,7 @@ dbsyncer.parser.table.group.buffer-period-millisecond=300
 
 ---
 
-## 四、全量+增量的协同
+## 五、全量+增量的协同
 
 ```
 启动时刻:
@@ -290,7 +440,7 @@ dbsyncer.parser.table.group.buffer-period-millisecond=300
 
 ---
 
-## 五、关键设计决策
+## 六、关键设计决策
 
 ### 为什么全量和增量同时运行？
 
