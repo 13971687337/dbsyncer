@@ -1,147 +1,108 @@
-## 介绍
-![logo](https://gitee.com/ghi/dbsyncer/raw/master/dbsyncer-web/src/main/resources/static/img/logo.png)
+# DBSyncer v3.0
 
-[DBSyncer](https://gitee.com/ghi/dbsyncer)（英[dbsɪŋkɜː(r)]，美[dbsɪŋkɜː(r) 简称dbs）是一款开源的数据同步中间件，提供MySQL、Oracle、SqlServer、PostgreSQL、Elasticsearch(ES)、Kafka、File、SQL等同步场景。支持上传插件自定义同步转换业务，提供监控全量和增量数据统计图、应用性能预警等。
+武汉互创联合科技 — 开源数据同步中间件，支持 MySQL、Oracle、SqlServer、PostgreSQL、Elasticsearch(ES)、Kafka、File、SQL 等同步场景。
 
-> 特点
-* 组合驱动，自定义库同步到库组合，关系型数据库与非关系型之间组合，任意搭配表同步映射关系
-* 实时监控，驱动全量或增量实时同步运行状态、结果、同步日志和系统日志
-* 开发插件，自定义转化同步逻辑
+## 版本更新
 
-> 项目地址
+| 版本 | 主要变更 |
+|------|----------|
+| 3.0.0 | JDK 8→21, Spring Boot 2.5→3.5, HikariCP 连接池, Vue 3 前端, 表组并行化, ES 8.x 客户端 |
+| 2.0.8 | 初始版本 |
 
-* [Gitee](https://gitee.com/ghi/dbsyncer "https://gitee.com/ghi/dbsyncer")  
-* [GitHub](https://github.com/86dbs/dbsyncer "https://github.com/86dbs/dbsyncer")
+## 技术栈
 
-[![star](https://gitee.com/ghi/dbsyncer/badge/star.svg?theme=dark)](https://gitee.com/ghi/dbsyncer/stargazers)
-[![fork](https://gitee.com/ghi/dbsyncer/badge/fork.svg?theme=dark)](https://gitee.com/ghi/dbsyncer/members)
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://gitee.com/ghi/dbsyncer/blob/master/LICENSE)
+- **后端**: Java 21, Spring Boot 3.5.3, Maven 3.6+
+- **连接池**: HikariCP 6.2
+- **前端**: Vue 3 + Vite + TypeScript + Pinia + Element Plus
+- **存储**: Apache Lucene 8.8 (磁盘) / MySQL 8.0
+- **序列化**: Protobuf 3.21, FastJSON2 2.0
 
-## 🌈应用场景
-| 连接器        | 数据源 | 目标源 | 支持版本(包含以下)     |
-|------------|---|---|----------------|
-| MySQL      | ✔ |  ✔ | 5.7.19以上       |
-| Oracle     | ✔ |  ✔ | 10g-19c        |
-| SqlServer  | ✔ |  ✔ | 2008以上         |
-| PostgreSQL | ✔ |  ✔ | 9.5.25以上       |
-| Sqlite     | ✔ |  ✔ | 2以上            |
-| ES         | ✔ |  ✔ | 6.0.0-8.15.3   |
-| Kafka      | ✔ |  ✔ | 2.10-0.9.0.0以上 |
-| File       | ✔ |  ✔ | *.txt, *.unl   |
-| SQL        | ✔ |  | 支持以上关系型数据库     |
-| 后期计划    | Redis | |                |
+## 环境要求
 
-## ✨预览
-![连接器和驱动](https://images.gitee.com/uploads/images/2021/0903/003755_01016fc1_376718.png "驱动管理.png")
+| 组件 | 版本 |
+|------|------|
+| JDK | 21+ |
+| Maven | 3.6+ |
+| Node.js (前端) | 18+ |
+| MySQL (可选) | 5.7+ / 8.0+ |
 
-![监控](https://foruda.gitee.com/images/1694424923138969858/111e55e0_376718.png "监控")
+## 快速开始
 
-## 📚[使用手册 Wiki](https://gitee.com/ghi/dbsyncer/wikis "https://gitee.com/ghi/dbsyncer/wikis")
+### 后端构建
 
-## 📦安装配置
-- dbsyncer-x.x.x.zip [社区版安装教程](https://gitee.com/ghi/dbsyncer/wikis/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C/%E7%A4%BE%E5%8C%BA%E7%89%88%E5%AE%89%E8%A3%85)
-- dbsyncer-enterprise-x.x.x.zip [专业版安装教程](https://gitee.com/ghi/dbsyncer/wikis/%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C/%E4%B8%93%E4%B8%9A%E7%89%88%E5%AE%89%E8%A3%85)
-
-#### 方式一 下载安装包
-1. 安装[JDK 1.8](https://www.oracle.com/java/technologies/jdk8-downloads.html)（省略详细）
-2. 下载安装包[dbsyncer-x.x.x.zip](https://gitee.com/ghi/dbsyncer/releases)（也可手动编译）
-3. 解压安装包，Window执行bin/startup.bat，Linux执行bin/startup.sh
-4. 打开浏览器访问：http://127.0.0.1:18686
-5. 账号和密码：admin/admin
-
-#### 方式二 🐳 docker
-* 阿里云镜像
-```shell
-# 社区版
-docker pull registry.cn-hangzhou.aliyuncs.com/xhtb/dbsyncer:latest
-# 专业版
-docker pull registry.cn-hangzhou.aliyuncs.com/xhtb/dbsyncer-enterprise:latest
-```
-
-* 运行命令
-```shell
-docker run -d \
-  --name=dbsyncer \
-  --restart=unless-stopped \
-  -p 18686:18686 \
-  -e TZ="Asia/Shanghai" \
-  -m 5g \
-  --memory-swap=5g \
-  -v /opt/dbsyncer/data:/app/dbsyncer/data \
-  -v /opt/dbsyncer/logs:/app/dbsyncer/logs \
-  -v /opt/dbsyncer/plugins:/app/dbsyncer/plugins \
-  --log-driver json-file \
-  --log-opt max-size=100m \
-  --log-opt max-file=7 \
-  registry.cn-hangzhou.aliyuncs.com/xhtb/dbsyncer:latest
-
-# 本地日志
-ls -la /opt/dbsyncer/logs
-
-# 容器日志
-docker logs --tail 20 dbsyncer
-# 容器实时日志（Ctrl+C退出）
-docker logs -f dbsyncer
-# 进入容器内部
-docker exec -it dbsyncer /bin/bash
-# 查看容器日志
-ls -la /app/dbsyncer/logs
-
-# 停止容器
-docker stop dbsyncer
-# 启动容器
-docker start dbsyncer
-# 重启容器
-docker restart dbsyncer
-# 删除容器（需先停止）
-docker rm dbsyncer
-```
-
-## ⚙️手动编译
-> 先确保环境已安装JDK和Maven
 ```bash
-$ git clone https://gitee.com/ghi/dbsyncer.git
-$ cd dbsyncer
-$ chmod u+x build.sh
-$ ./build.sh
+git clone git@gitee.com:ZaneGitHome/hc-dbsync.git
+cd hc-dbsync
+
+# 构建
+chmod u+x build.sh
+./build.sh
+
+# 启动
+cd dbsyncer-web
+java -jar target/dbsyncer-*.jar
 ```
-## 🏆[性能测试](https://gitee.com/ghi/dbsyncer/wikis/%E5%BF%AB%E9%80%9F%E4%BA%86%E8%A7%A3/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95)
-#### 全量同步
 
-| 系统 | 机器配置 |  数据量 |  耗时 |
-|---|---|---|---|
+### 前端开发
+
+```bash
+cd dbsyncer-web-ui
+npm install --registry=https://registry.npmmirror.com
+npm run dev
+```
+
+浏览器访问 `http://127.0.0.1:5173`，默认账号密码 `admin/admin`。
+
+## 应用场景
+
+| 连接器 | 数据源 | 目标源 | 增量方式 |
+|--------|--------|--------|----------|
+| MySQL | ✔ | ✔ | Binlog CDC |
+| Oracle | ✔ | ✔ | LogMiner CDC |
+| SqlServer | ✔ | ✔ | Agent CDC |
+| PostgreSQL | ✔ | ✔ | Logical Replication |
+| SQLite | ✔ | ✔ | — |
+| Elasticsearch | ✔ | ✔ | 定时轮询 |
+| Kafka | ✔ | ✔ | 原生消费 |
+| File | ✔ | ✔ | WatchService |
+
+## 性能
+
+| 系统 | 机器配置 | 数据量 | 耗时 |
+|------|----------|--------|------|
 | Mac | Apple M3 Pro 12核心 内存18GB | 1亿条 | 31分50秒 |
-| Linux | Intel(R) Xeon(R) CPU E5-2696 v3B 8核心 内存48GB | 1亿条 | 37分52秒 |
-| Windows | AMD Ryzen 7 5800x 8核心 12GB | 1亿条 | 57分43秒 |
+| Linux | Intel Xeon E5-2696 v3B 8核心 48GB | 1亿条 | 37分52秒 |
 
-#### 增量同步
-| 系统 | 机器配置 |  分配内存 |  TPS | 峰值 |
-|---|---|---|---|---|
-| Mac | Apple M3 Pro 12核心 内存18GB | 4GB | 8112/秒 | 11000/秒 |
-| Linux | Intel(R) Xeon(R) CPU E5-2696 v3B 8核心 内存48GB | 4GB | 8000/秒 | 10000/秒 |
-| Windows | AMD Ryzen 7 5800x 8核心 12GB | 4GB | 7553/秒 | 9000/秒 |
+增量 TPS 峰值: ~11000/秒
 
-<img src="https://foruda.gitee.com/images/1722860668272963387/7110f00f_376718.png" />
+## 项目结构
 
-<img src="https://foruda.gitee.com/images/1732952268144233045/b607609e_376718.png" />
+```
+hc-dbsync/
+├── dbsyncer-sdk/         # SDK — 连接器接口、数据模型
+├── dbsyncer-connector/   # 连接器实现 (8种)
+├── dbsyncer-parser/      # 解析引擎 (全量/增量同步管线)
+├── dbsyncer-biz/         # 业务逻辑层
+├── dbsyncer-manager/     # 任务管理 (FullPuller/IncrementPuller)
+├── dbsyncer-storage/     # Lucene 磁盘索引存储
+├── dbsyncer-plugin/      # 自定义插件
+├── dbsyncer-common/      # 公共工具类
+├── dbsyncer-web/         # Spring Boot Web 层 + REST API
+├── dbsyncer-web-ui/      # Vue 3 前端
+└── docs/                 # 技术文档
+```
 
-[专业版介绍](https://gitee.com/ghi/dbsyncer/wikis/DBSyncer%E4%B8%93%E4%B8%9A%E7%89%88)
+## 文档
 
-## 🐞[常见问题](https://gitee.com/ghi/dbsyncer/wikis/%E5%92%A8%E8%AF%A2%E9%97%AE%E9%A2%98/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98) 
-* MySQL无法连接。默认使用的驱动版本为8.0.21，如果为mysql5.x需要手动替换驱动 [mysql-connector-java-5.1.40.jar](https://gitee.com/ghi/dbsyncer/attach_files) 
-* SQLServer无法连接。案例：[驱动程序无法通过使用安全套接字层(SSL)加密与 SQL Server 建立安全连接。错误:“The server selected protocol version TLS10 is not accepted by client preferences [TLS12]”](https://gitee.com/ghi/dbsyncer/issues/I4PL46?from=project-issue) 
-* 同步数据乱码。案例：[mysql8表导入sqlserver2008R2后，sqlserver表nvarchar字段内容为乱码](https://gitee.com/ghi/dbsyncer/issues/I4JXY0) 
-* [如何开启远程debug模式？](https://gitee.com/ghi/dbsyncer/issues/I63F6R)  
+- [架构总览](docs/architecture.md)
+- [技术栈参考](docs/tech-stack.md)
+- [同步管线深度分析](docs/sync-pipeline.md)
+- [性能分析与优化](docs/performance.md)
+- [部署配置](docs/deployment.md)
+- [插件开发指南](docs/plugin-dev.md)
+- [REST API](docs/api/rest-api.md)
+- [OpenAPI 集成](docs/api/open-api.md)
 
-## 🤝贡献支持
-* DBS团队目标：**坚持开源，让每一个用户都能轻松完成数据同步！** 
-* QQ群讨论: **875519623** 
-* 欢迎大家提需求和建议[【新建issuses】](https://gitee.com/ghi/dbsyncer/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0)!（详细描述你的原始需求，我们会帮你提供一些方案，节约大家的成本）
-1) **内推项目** 如您觉得项目不错，可推荐到公司，建立长期稳定的商业合作，提供更专业的技术服务。（入群联系群主）
-2) **参与开发** 项目成员有不同专业的大佬，相信一定能找到您比较感兴趣的方向，欢迎加入团队！（入群联系群主）
-3) 需要专业技术指导，欢迎加 [**会员粉丝服务群**](https://gitee.com/ghi/dbsyncer/wikis/%E4%BC%9A%E5%91%98%E7%B2%89%E4%B8%9D%E6%9C%8D%E5%8A%A1%E7%BE%A4?sort_id=9604090)。
-4) 开源不易，感谢粉丝朋友们的支持！[【捐赠者名单】](https://gitee.com/ghi/dbsyncer/issues/I4HL3C) 
+## 许可证
 
-<p>
-<img src="https://foruda.gitee.com/images/1736348493470674811/5761f9e8_13999669.png "二维码_01.png"" title="微信扫码" width="258px" height="283.8px" /><img src="https://foruda.gitee.com/images/1736348568894927308/12fe6e2d_13999669.png "二维码_02.png"" title="微信扫码" width="258px" height="283.8px" /><img src="https://foruda.gitee.com/images/1738991478241390049/8f566d69_13999669.png "哔站二维码.png"" title="微信扫码" width="258px" height="283.8px" /><img src="https://foruda.gitee.com/images/1738991647697099987/ebfc3ca3_13999669.png "抖音二维码.png"" title="抖音扫码" width="258px" height="283.8px" /><img src="https://foruda.gitee.com/images/1710433659737550167/452d76c9_376718.png" title="DBSyncer款项用于研发推广" width="223.2px" height="286.4px" />
-<p>
+Apache License 2.0

@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=2.0.8_$(date +"%m%d")
+VERSION=3.0.0_$(date +"%m%d")
 read -p "Please enter a new version number($VERSION)：" APP_VERSION
 if [ -z "$APP_VERSION" ]; then
   APP_VERSION=$VERSION
@@ -12,3 +12,5 @@ echo "Update version ..."
 mvn versions:set -DnewVersion=$APP_VERSION -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
 mvn -N versions:update-child-modules
 mvn versions:commit
+
+echo "Version updated to $APP_VERSION"
