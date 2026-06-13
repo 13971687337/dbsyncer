@@ -57,7 +57,7 @@ public class DatabaseConnectorInstance implements ConnectorInstance<DatabaseConf
             if (connection != null) {
                 try {
                     connection.close();
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     logger.warn("Failed to close connection: {}", e.getMessage());
                 }
             }
