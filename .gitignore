@@ -15,4 +15,4 @@ velocity.log.1
 */.settings/*
 target/
 log.txt
-*.zip
+*.zip.DS_Store
