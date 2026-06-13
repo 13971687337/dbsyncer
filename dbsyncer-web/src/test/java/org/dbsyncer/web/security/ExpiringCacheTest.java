@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 过期缓存工具类测试
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class ExpiringCacheTest {

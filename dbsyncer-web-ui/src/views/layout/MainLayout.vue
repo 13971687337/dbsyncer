@@ -1,7 +1,7 @@
 <template>
   <el-container class="layout">
     <el-aside width="220px">
-      <div class="logo">DBSyncer</div>
+      <div class="logo">武汉互创联合科技</div>
       <el-menu :default-active="activeMenu" router background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
         <el-menu-item index="/">
           <el-icon><DataAnalysis /></el-icon><span>首页</span>

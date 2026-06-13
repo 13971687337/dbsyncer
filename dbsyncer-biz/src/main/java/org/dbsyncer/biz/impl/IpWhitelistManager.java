@@ -20,7 +20,7 @@ import java.util.List;
  * 负责IP白名单的验证和管理
  * 支持单个IP、IP段（CIDR）和IP范围
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 @Component

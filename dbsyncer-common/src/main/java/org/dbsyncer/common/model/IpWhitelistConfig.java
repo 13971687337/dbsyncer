@@ -10,7 +10,7 @@ import java.util.List;
  * IP白名单配置
  * 支持单个IP和IP段（CIDR）配置
  *
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class IpWhitelistConfig {

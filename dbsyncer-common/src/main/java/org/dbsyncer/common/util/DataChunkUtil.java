@@ -13,7 +13,7 @@ import java.util.List;
  * 数据分片工具
  * 用于大数据量传输时的分片处理
  *
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class DataChunkUtil {

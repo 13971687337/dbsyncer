@@ -12,7 +12,7 @@ import java.util.Map;
  * 业务系统凭证配置
  * 支持多版本密钥管理，用于平滑轮换
  *
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class AppCredentialConfig {

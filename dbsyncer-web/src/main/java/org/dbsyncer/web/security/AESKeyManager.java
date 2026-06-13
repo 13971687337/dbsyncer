@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 支持长期有效的AES密钥，并支持动态变更
  * 使用ExpiringCache管理密钥的过期时间
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class AESKeyManager {

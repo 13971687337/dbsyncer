@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * AES密钥管理器测试
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class AESKeyManagerTest {

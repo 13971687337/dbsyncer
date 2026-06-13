@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 时间窗口验证工具测试
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class TimestampValidatorTest {

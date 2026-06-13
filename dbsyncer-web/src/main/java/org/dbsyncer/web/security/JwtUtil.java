@@ -20,7 +20,7 @@ import java.util.Map;
  * JWT工具类
  * 支持生成、验证、刷新token
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class JwtUtil {

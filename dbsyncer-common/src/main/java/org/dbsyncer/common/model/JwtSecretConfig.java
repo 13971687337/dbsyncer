@@ -10,7 +10,7 @@ import java.util.Map;
  * JWT密钥配置
  * 支持密钥版本管理和多个历史密钥，用于平滑轮换
  *
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class JwtSecretConfig {

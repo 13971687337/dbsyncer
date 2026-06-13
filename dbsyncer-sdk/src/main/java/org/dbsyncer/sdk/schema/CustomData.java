@@ -8,7 +8,7 @@ import org.dbsyncer.common.util.StringUtil;
 import java.util.Collection;
 
 /**
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  * @time 2026-01-18 12:48
  */

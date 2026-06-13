@@ -25,7 +25,7 @@ import java.util.Map;
  * 负责JWT密钥的生成、存储、获取和轮换
  * 支持多个历史密钥，实现平滑轮换
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 @Component

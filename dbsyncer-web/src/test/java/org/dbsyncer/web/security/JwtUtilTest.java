@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * JWT工具类测试
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class JwtUtilTest {

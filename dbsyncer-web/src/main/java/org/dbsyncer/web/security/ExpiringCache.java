@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 过期缓存工具类
  * 支持自定义过期时间，自动清理过期数据
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class ExpiringCache<K, V> {

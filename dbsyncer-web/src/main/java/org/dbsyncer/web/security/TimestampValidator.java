@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * 时间窗口验证工具
  * 用于防止重放攻击，验证请求时间戳的有效性
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 public class TimestampValidator {

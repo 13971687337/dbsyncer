@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * OpenAPI控制器
  * 提供外部业务系统集成接口
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 @RestController

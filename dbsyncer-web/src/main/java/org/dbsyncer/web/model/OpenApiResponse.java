@@ -6,7 +6,7 @@ package org.dbsyncer.web.model;
 /**
  * OpenAPI统一响应格式
  *
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 public class OpenApiResponse<T> {

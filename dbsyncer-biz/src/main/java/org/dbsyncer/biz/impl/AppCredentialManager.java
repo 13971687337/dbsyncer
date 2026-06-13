@@ -23,7 +23,7 @@ import java.util.List;
  * 负责业务系统 appId 和 appSecret 的验证和管理
  * 支持多版本密钥，实现平滑轮换
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 2.0.0
  */
 @Component

@@ -4,7 +4,7 @@
 package org.dbsyncer.connector.sqlserver.schema;
 
 /**
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  * @date 2026-01-18 14:01
  */

@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
  * OpenAPI拦截器
  * 处理token验证和加密解密
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 @Component

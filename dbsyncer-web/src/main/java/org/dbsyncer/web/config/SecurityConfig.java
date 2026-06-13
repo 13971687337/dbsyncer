@@ -16,7 +16,7 @@ import jakarta.annotation.PreDestroy;
  * 安全配置类
  * 初始化安全相关的缓存和定时任务
  * 
- * @author 穿云
+ * @author zhangxl
  * @version 1.0.0
  */
 @Configuration
