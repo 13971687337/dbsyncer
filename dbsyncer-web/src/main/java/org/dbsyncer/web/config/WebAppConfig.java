@@ -16,11 +16,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -34,56 +34,74 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-/**
- * @author AE86
- * @version 1.0.0
- * @date 2019/10/23 23:57
- */
 @Configuration
 @EnableWebSecurity
 @ConfigurationProperties(prefix = "dbsyncer.web.security")
-public class WebAppConfig extends WebSecurityConfigurerAdapter implements AuthenticationProvider, HttpSessionListener {
+public class WebAppConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     * 认证地址
-     */
     private static final String LOGIN = "/login";
-
-    /**
-     * 认证页面
-     */
     private static final String LOGIN_PAGE = "/login.html";
-
-    /**
-     * 每个帐号允许同时登录会话数, 默认同一个帐号只能在一个地方登录
-     */
     private static final int MAXIMUM_SESSIONS = 1;
 
     @Resource
     private UserConfigService userConfigService;
 
-    /**
-     * 是否重置管理员密码
-     */
     private boolean resetPwd;
 
-    /**
-     * 登录失败
-     *
-     * @return
-     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/plugins/**", "/index/version.json").permitAll()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginProcessingUrl(LOGIN)
+                .loginPage(LOGIN_PAGE)
+                .successHandler(loginSuccessHandler())
+                .failureHandler(loginFailHandler())
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .permitAll()
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessHandler(logoutHandler())
+            )
+            .sessionManagement(session -> session
+                .sessionFixation().migrateSession()
+                .maximumSessions(MAXIMUM_SESSIONS)
+            );
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        return new DBSyncerAuthenticationProvider();
+    }
+
+    @Bean
+    public HttpSessionListener httpSessionListener() {
+        return new HttpSessionListener() {
+            @Override
+            public void sessionCreated(HttpSessionEvent se) {
+                logger.debug("创建会话:{}", se.getSession().getId());
+            }
+            @Override
+            public void sessionDestroyed(HttpSessionEvent se) {
+                logger.debug("销毁会话:{}", se.getSession().getId());
+            }
+        };
+    }
+
     @Bean
     public AuthenticationFailureHandler loginFailHandler() {
         return (request, response, e) -> write(response, RestResult.restFail(e.getMessage(), 401));
     }
 
-    /**
-     * 登录成功
-     *
-     * @return
-     */
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler loginSuccessHandler() {
         return new SavedRequestAwareAuthenticationSuccessHandler() {
@@ -110,82 +128,34 @@ public class WebAppConfig extends WebSecurityConfigurerAdapter implements Authen
         };
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        //http.csrf().disable()
-        //        .authorizeRequests()
-        //        .anyRequest().permitAll()
-        //        .and().logout().permitAll();
+    private class DBSyncerAuthenticationProvider implements AuthenticationProvider {
+        @Override
+        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+            String username = (String) authentication.getPrincipal();
+            String password = (String) authentication.getCredentials();
+            password = SHA1Util.b64_sha1(password);
 
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/css/**", "/js/**", "/img/**", "/plugins/**", "/index/version.json").permitAll().anyRequest()
-                .authenticated()
-                .and()
-                .formLogin()
-                .loginProcessingUrl(LOGIN)
-                .loginPage(LOGIN_PAGE)
-                .successHandler(loginSuccessHandler())
-                .failureHandler(loginFailHandler())
-                .permitAll()
-                .and()
-                .logout()
-                .permitAll()
-                .invalidateHttpSession(true).deleteCookies("JSESSIONID").logoutSuccessHandler(logoutHandler())
-                .and()
-                .sessionManagement()
-                .sessionFixation()
-                .migrateSession()
-                .maximumSessions(MAXIMUM_SESSIONS);
-    }
-
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        // 获取表单用户名
-        String username = (String) authentication.getPrincipal();
-        // 获取表单用户填写的密码
-        String password = (String) authentication.getCredentials();
-        password = SHA1Util.b64_sha1(password);
-
-        UserInfo userInfo = userConfigService.getUserInfo(username);
-        // 重置密码
-        if (resetPwd && userInfo != null) {
-            UserInfo defUser = userConfigService.getDefaultUser();
-            if (StringUtil.equals(defUser.getUsername(), username) && StringUtil.equals(defUser.getPassword(), password)) {
-                userInfo.setPassword(password);
-                logger.info("重置[{}]密码成功!", username);
+            UserInfo userInfo = userConfigService.getUserInfo(username);
+            if (resetPwd && userInfo != null) {
+                UserInfo defUser = userConfigService.getDefaultUser();
+                if (StringUtil.equals(defUser.getUsername(), username) && StringUtil.equals(defUser.getPassword(), password)) {
+                    userInfo.setPassword(password);
+                    logger.info("重置[{}]密码成功!", username);
+                }
             }
+            if (null == userInfo || !StringUtil.equals(userInfo.getPassword(), password)) {
+                throw new BadCredentialsException("对不起,您输入的帐号或密码错误");
+            }
+            List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userInfo.getRoleCode());
+            return new UsernamePasswordAuthenticationToken(username, password, authorities);
         }
-        if (null == userInfo || !StringUtil.equals(userInfo.getPassword(), password)) {
-            throw new BadCredentialsException("对不起,您输入的帐号或密码错误");
+
+        @Override
+        public boolean supports(Class<?> authentication) {
+            return true;
         }
-        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(userInfo.getRoleCode());
-        return new UsernamePasswordAuthenticationToken(username, password, authorities);
     }
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return true;
-    }
-
-    @Override
-    public void sessionCreated(HttpSessionEvent se) {
-        logger.debug("创建会话:{}", se.getSession().getId());
-        int maxInactiveInterval = se.getSession().getMaxInactiveInterval();
-        logger.debug(String.valueOf(maxInactiveInterval));
-    }
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent se) {
-        logger.debug("销毁会话:{}", se.getSession().getId());
-    }
-
-    /**
-     * 响应
-     *
-     * @param response
-     * @param result
-     */
     private void write(HttpServletResponse response, RestResult result) {
         PrintWriter out = null;
         try {
