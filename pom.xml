@@ -267,4 +267,27 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>--add-opens</arg><arg>java.base/java.lang=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/java.util=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/java.lang.reflect=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/java.text=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/java.io=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/java.nio=ALL-UNNAMED</arg>
+                            <arg>--add-opens</arg><arg>java.base/sun.nio.ch=ALL-UNNAMED</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
 </project>
