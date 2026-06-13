@@ -4,7 +4,7 @@
 
 ## 应用入口
 
-### Application.java
+### Application.java `web/Application.java:24`
 
 ```java
 @EnableAsync
@@ -32,7 +32,7 @@ public class Application {
 
 ## 安全配置
 
-### WebAppConfig
+### WebAppConfig `web/config/WebAppConfig.java:45`
 
 ```java
 @Configuration

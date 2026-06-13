@@ -17,9 +17,9 @@ dbsyncer-connector/
 └── dbsyncer-connector-file/        # File 连接器
 ```
 
-## ConnectorFactory（连接器核心枢纽）
+## ConnectorFactory（连接器核心枢纽）`connector-base/.../ConnectorFactory.java:47`
 
-`connector.base.ConnectorFactory` 是全部连接器的统一入口：
+通过 `@PostConstruct` (line 57) 使用 Java `ServiceLoader` 加载所有 `ConnectorService` SPI 实现 (line 58-63)。
 
 ```java
 @Component
@@ -39,18 +39,15 @@ public class ConnectorFactory implements DisposableBean {
 
 ### 关键方法
 
-| 方法 | 说明 |
-|------|------|
-| `connect(instanceId, config, catalog, schema)` | 建立连接并缓存到连接池，返回克隆实例 |
-| `connect(instanceId)` | 从池中获取已有连接 |
-| `disconnect(instanceId)` | 原子性地断开并移除连接 |
-| `getListener(connectorType, listenerType)` | 获取监听器（用于增量同步） |
-| `getTables(connectorInstance, context)` | 获取表列表（按名称排序） |
-| `getMetaInfo(connectorInstance, context)` | 获取字段元信息 |
-| `reader(context)` | 读取数据（委托给对应 ConnectorService） |
-| `writer(context)` | 写入数据（含转换预处理和 trace 日志） |
-| `writerDDL(connectorInstance, ddlConfig)` | 执行 DDL（用于 DDL 同步） |
-| `getCommand(sourceConfig, targetConfig)` | 合并源和目标连接器的同步参数 |
+| 方法 | 行号 | 说明 |
+|------|------|------|
+| `connect(id, config, catalog, schema)` | `:80` | 建立连接并缓存到池，返回克隆实例 |
+| `connect(instanceId)` | `:109` | 从池中获取已有连接 |
+| `getListener(connectorType, listenerType)` | `:122` | 获取增量监听器 |
+| `reader(context)` | `:198` | 读数据，委托给对应 ConnectorService |
+| `writer(context)` | `:207` | 写数据，含 `convertProcessBeforeWriter` 预处理 |
+| `writerDDL(instance, config)` | `:236` | 执行 DDL |
+| `disconnect(instanceId)` | `:265` | 原子性断开并从池中移除 |
 
 ## 各连接器能力
 

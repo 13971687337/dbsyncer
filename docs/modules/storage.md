@@ -4,9 +4,9 @@
 
 ## 存储实现
 
-### DiskStorageService
+### DiskStorageService `storage/impl/DiskStorageService.java:48`
 
-`storage.impl.DiskStorageService` 继承 `AbstractStorageService`，基于 Lucene 索引实现：
+继承 `AbstractStorageService`，基于 Lucene 索引实现。数据根路径 line 55：`System.getProperty("user.dir") + "/data/"`。
 
 ```java
 public class DiskStorageService extends AbstractStorageService {

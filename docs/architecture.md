@@ -4,6 +4,22 @@
 
 DBSyncer 是一个开源数据同步中间件，解决"异构数据源之间的数据迁移和实时同步"问题。支持关系型数据库（MySQL、Oracle、SQL Server、PostgreSQL、SQLite）与中间件（Elasticsearch、Kafka、File）之间任意组合的全量和增量同步。
 
+
+## 源码路标
+
+关键入口文件可通过以下路径快速定位：
+
+| 组件 | 文件 |
+|------|------|
+| Spring Boot 入口 | `dbsyncer-web/.../web/Application.java:24` |
+| 连接器工厂 (SPI) | `dbsyncer-connector/.../connector/base/ConnectorFactory.java:47` |
+| 全量同步管线 | `dbsyncer-parser/.../parser/impl/ParserComponentImpl.java:113` |
+| 任务生命周期 | `dbsyncer-manager/.../manager/ManagerFactory.java:22` |
+| Lucene 存储 | `dbsyncer-storage/.../storage/impl/DiskStorageService.java:48` |
+| 安全配置 | `dbsyncer-web/.../web/config/WebAppConfig.java:45` |
+| 根 POM | `pom.xml` (v2.0.8) |
+| 配置参数 | `dbsyncer-web/src/main/resources/application.properties` |
+
 ## 分层架构
 
 ```

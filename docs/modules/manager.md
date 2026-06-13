@@ -4,9 +4,9 @@
 
 ## 核心组件
 
-### ManagerFactory
+### ManagerFactory `manager/ManagerFactory.java:22`
 
-任务生命周期管理的统一入口（`@Component` + `ApplicationListener<ClosedEvent>`）：
+任务生命周期管理的统一入口（`@Component` + `ApplicationListener<ClosedEvent>`）。`onApplicationEvent` (line 31) 处理关闭事件，`start` (line 35) 启任务，`close` (line 50) 停任务。
 
 ```java
 @Component

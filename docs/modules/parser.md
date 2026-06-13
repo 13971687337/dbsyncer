@@ -15,11 +15,11 @@ public interface ParserComponent {
 }
 ```
 
-实现类：`ParserComponentImpl`（`@Component`）
+实现类：`ParserComponentImpl` `parser/impl/ParserComponentImpl.java:56`
 
 ## 全量同步流程
 
-`ParserComponentImpl.execute()` 实现了完整的数据同步管线：
+`ParserComponentImpl.execute()` (line 113) 实现了完整的数据同步管线：
 
 ```
 1. 加载源和目标连接器配置
@@ -40,7 +40,7 @@ public interface ParserComponent {
 6. 判尾：source.size() < pageSize 则结束
 ```
 
-### 批量写入策略 (`writeBatch`)
+### 批量写入策略 (`writeBatch` line 206)
 
 - 数据量 ≤ batchSize → 单次同步写入
 - 数据量 > batchSize → 拆分为 N 个任务，通过 `CountDownLatch` 并行执行
