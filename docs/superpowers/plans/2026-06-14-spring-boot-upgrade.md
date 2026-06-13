@@ -1,4 +1,4 @@
-# Phase 1: Spring Boot 3.5.x + JDK 21 Upgrade Plan (APPROACH B)
+A# Phase 1: Spring Boot 3.5.x + JDK 21 Upgrade Plan (APPROACH B)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -805,22 +805,50 @@ Expected: Returns login page HTML.
 curl -s http://localhost:18687/app/health
 ```
 
-Expected: `{"status":"UP",...}`. Also verify HikariCP metrics are visible:
+Expected: `{"status":"UP",...}`.
+
+- [ ] **Step 4: Verify HikariCP metrics**
 
 ```bash
 curl -s http://localhost:18687/app/metrics/hikaricp.connections.active
 ```
 
-- [ ] **Step 4: Kill test instance**
+- [ ] **Step 5: Login smoke tests (correct password, wrong password)**
+
+```bash
+# 登录页面可访问
+curl -s -o /dev/null -w "%{http_code}" http://localhost:18687/login.html
+# Expected: 200
+
+# 正确密码登录（admin/admin）
+curl -s -X POST http://localhost:18687/login \
+  -d "username=admin" -d "password=admin" -c /tmp/dbsyncer-cookies.txt
+# Expected: {"code":0,"message":"admin 登录成功!",...}
+
+# 错误密码登录
+curl -s -X POST http://localhost:18687/login \
+  -d "username=admin" -d "password=wrongpassword"
+# Expected: {"code":-1,"message":"对不起,您输入的帐号或密码错误",...,"status":401}
+
+# 已登录状态下访问受保护页面
+curl -s -o /dev/null -w "%{http_code}" -b /tmp/dbsyncer-cookies.txt http://localhost:18687/
+# Expected: 200
+
+# 未登录状态下访问受保护页面（重定向到 login）
+curl -s -o /dev/null -w "%{http_code}" http://localhost:18687/index/list.html
+# Expected: 302
+```
+
+- [ ] **Step 6: Kill test instance**
 
 ```bash
 kill %1 2>/dev/null || true
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git commit --allow-empty -m "chore: smoke test passed — app starts with HikariCP on JDK 21"
+git commit --allow-empty -m "chore: smoke test passed — app starts, login works, HikariCP OK on JDK 21"
 ```
 
 ---
