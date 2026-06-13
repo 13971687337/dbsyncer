@@ -5,7 +5,7 @@
 
     <Properties>
         <!-- logPath: 可通过 -DlogPath 系统属性设置绝对路径，否则使用相对路径 logs -->
-        <Property name="logPath">${sys:logPath:-logs}</Property>
+        <Property name="logPath">logs</Property>
         <!-- 日志输出格式 -->
         <property name="LOG_PATTERN" value="%d{HH:mm:ss:SSS} [%thread] [%p] - %c{1.} %M:%L - %m%n" />
     </Properties>
