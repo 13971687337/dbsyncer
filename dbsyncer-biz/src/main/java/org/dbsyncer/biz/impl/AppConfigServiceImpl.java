@@ -11,7 +11,7 @@ import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.parser.model.SystemConfig;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * @Author AE86

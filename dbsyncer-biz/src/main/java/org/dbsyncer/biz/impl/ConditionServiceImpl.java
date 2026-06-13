@@ -11,7 +11,7 @@ import org.dbsyncer.parser.ProfileComponent;
 import org.dbsyncer.sdk.enums.OperationEnum;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

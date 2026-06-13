@@ -11,8 +11,8 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.annotation.Resource;
-import javax.servlet.MultipartConfigElement;
+import jakarta.annotation.Resource;
+import jakarta.servlet.MultipartConfigElement;
 
 /**
  * Web配置

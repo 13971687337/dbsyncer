@@ -16,7 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;

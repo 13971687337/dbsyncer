@@ -5,8 +5,8 @@ import org.dbsyncer.biz.ConvertService;
 import org.dbsyncer.biz.PluginService;
 import org.springframework.ui.ModelMap;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
