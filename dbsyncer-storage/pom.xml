@@ -30,6 +30,13 @@
             <artifactId>lucene-analyzers-smartcn</artifactId>
         </dependency>
 
+        <!-- Lucene Highlighter -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-highlighter</artifactId>
+            <version>${lucene-analyzers-smartcn.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

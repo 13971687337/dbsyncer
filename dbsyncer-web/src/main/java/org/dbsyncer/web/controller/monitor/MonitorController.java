@@ -329,22 +329,40 @@ public class MonitorController extends BaseController {
     }
 
     private MetricResponse getMetricResponse(String code) {
-        MetricsEndpoint.MetricResponse metric = metricsEndpoint.metric(code, null);
-        if (metric == null) {
+        Object metricObj = metricsEndpoint.metric(code, java.util.Collections.emptyList());
+        if (metricObj == null) {
             throw new IllegalArgumentException("不支持指标=" + code);
         }
+        // Spring Boot 3.x: MetricsEndpoint.metric() returns MetricsEndpoint.MetricResponse
+        // Use reflection-compatible access via getName() if available
         MetricResponse metricResponse = new MetricResponse();
-        MetricEnum metricEnum = MetricEnum.getMetric(metric.getName());
+        String metricName = code;
+        try {
+            metricName = (String) metricObj.getClass().getMethod("getName").invoke(metricObj);
+        } catch (Exception e) {
+            // fallback to code
+        }
+        MetricEnum metricEnum = MetricEnum.getMetric(metricName);
         if (metricEnum == null) {
             throw new BizException(String.format("Metric code \"%s\" does not exist.", code));
         }
         metricResponse.setCode(metricEnum.getCode());
         metricResponse.setGroup(metricEnum.getGroup());
         metricResponse.setMetricName(metricEnum.getMetricName());
-        if (!CollectionUtils.isEmpty(metric.getMeasurements())) {
-            List<Sample> measurements = new ArrayList<>();
-            metric.getMeasurements().forEach(s -> measurements.add(new Sample(s.getStatistic().getTagValueRepresentation(), s.getValue())));
-            metricResponse.setMeasurements(measurements);
+        try {
+            java.util.List measurementsList = (java.util.List) metricObj.getClass().getMethod("getMeasurements").invoke(metricObj);
+            if (!CollectionUtils.isEmpty(measurementsList)) {
+                List<Sample> measurements = new ArrayList<>();
+                for (Object s : measurementsList) {
+                    Object statistic = s.getClass().getMethod("getStatistic").invoke(s);
+                    String tagRep = (String) statistic.getClass().getMethod("getTagValueRepresentation").invoke(statistic);
+                    double value = (Double) s.getClass().getMethod("getValue").invoke(s);
+                    measurements.add(new Sample(tagRep, value));
+                }
+                metricResponse.setMeasurements(measurements);
+            }
+        } catch (Exception e) {
+            logger.debug("Unable to read metric measurements", e);
         }
         return metricResponse;
     }
