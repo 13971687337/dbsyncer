@@ -28,9 +28,7 @@
 
     <modules>
         <module>dbsyncer-connector-base</module>
-        <!-- P2: JDK 21 incompatible → migrate to elasticsearch-java
         <module>dbsyncer-connector-elasticsearch</module>
-        -->
         <module>dbsyncer-connector-file</module>
         <module>dbsyncer-connector-kafka</module>
         <module>dbsyncer-connector-mysql</module>

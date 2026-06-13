@@ -28,9 +28,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 全量同步
@@ -100,20 +102,30 @@ public final class FullPuller extends AbstractPuller implements ApplicationListe
     }
 
     private void doTask(Task task, Mapping mapping, List<TableGroup> list, Executor executor) {
-        // 记录开始时间
         long now = Instant.now().toEpochMilli();
         task.setBeginTime(now);
         task.setEndTime(now);
 
-        // 获取上次同步点
         Meta meta = profileComponent.getMeta(task.getId());
         Map<String, String> snapshot = meta.getSnapshot();
         task.setPageIndex(NumberUtil.toInt(snapshot.get(ParserEnum.PAGE_INDEX.getCode()), ParserEnum.PAGE_INDEX.getDefaultValue()));
-        // 反序列化游标值类型(通常为数字或字符串类型)
         task.setCursors(PrimaryKeyUtil.getLastCursors(snapshot.get(ParserEnum.CURSOR.getCode())));
         task.setTableGroupIndex(NumberUtil.toInt(snapshot.get(ParserEnum.TABLE_GROUP_INDEX.getCode()), ParserEnum.TABLE_GROUP_INDEX.getDefaultValue()));
         flush(task);
 
+        int parallelism = Math.max(1, Math.min(mapping.getThreadNum(), list.size()));
+        if (parallelism > 1) {
+            doTaskParallel(task, mapping, list, executor, parallelism);
+        } else {
+            doTaskSequential(task, mapping, list, executor);
+        }
+
+        task.setEndTime(Instant.now().toEpochMilli());
+        task.setTableGroupIndex(ParserEnum.TABLE_GROUP_INDEX.getDefaultValue());
+        flush(task);
+    }
+
+    private void doTaskSequential(Task task, Mapping mapping, List<TableGroup> list, Executor executor) {
         int i = task.getTableGroupIndex();
         while (i < list.size()) {
             parserComponent.execute(task, mapping, list.get(i), executor);
@@ -125,11 +137,57 @@ public final class FullPuller extends AbstractPuller implements ApplicationListe
             task.setTableGroupIndex(++i);
             flush(task);
         }
+    }
 
-        // 记录结束时间
-        task.setEndTime(Instant.now().toEpochMilli());
-        task.setTableGroupIndex(ParserEnum.TABLE_GROUP_INDEX.getDefaultValue());
-        flush(task);
+    private void doTaskParallel(Task task, Mapping mapping, List<TableGroup> list, Executor executor, int parallelism) {
+        int startIndex = task.getTableGroupIndex();
+        int remaining = list.size() - startIndex;
+        int batchSize = Math.max(1, remaining / parallelism + (remaining % parallelism > 0 ? 1 : 0));
+
+        logger.info("并行全量同步: metaId={}, tables={}, parallelism={}, batchSize={}",
+                task.getId(), remaining, parallelism, batchSize);
+
+        AtomicInteger completedCount = new AtomicInteger(0);
+        for (int batch = 0; batch < parallelism && task.isRunning(); batch++) {
+            final int batchStart = startIndex + batch * batchSize;
+            final int batchEnd = Math.min(batchStart + batchSize, list.size());
+            if (batchStart >= batchEnd) break;
+
+            executor.execute(() -> {
+                Task subTask = new Task(task.getId() + "-batch-" + batchStart);
+                subTask.setPageIndex(task.getPageIndex());
+                subTask.setCursors(task.getCursors());
+                try {
+                    for (int i = batchStart; i < batchEnd && task.isRunning(); i++) {
+                        parserComponent.execute(subTask, mapping, list.get(i), executor);
+                        subTask.setPageIndex(ParserEnum.PAGE_INDEX.getDefaultValue());
+                        subTask.setCursors(null);
+                        subTask.setTableGroupIndex(i);
+                    }
+                } catch (Exception e) {
+                    logger.error("并行同步批次[{}]异常: {}", batchStart, e.getMessage(), e);
+                } finally {
+                    completedCount.incrementAndGet();
+                }
+            });
+        }
+
+        // 等待所有并行批次完成
+        while (task.isRunning() && completedCount.get() < Math.min(parallelism, remaining)) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        if (task.isRunning()) {
+            task.setTableGroupIndex(list.size());
+            task.setPageIndex(ParserEnum.PAGE_INDEX.getDefaultValue());
+            task.setCursors(null);
+            flush(task);
+        }
     }
 
     private void flush(Task task) {
