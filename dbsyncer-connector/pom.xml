@@ -28,8 +28,7 @@
 
     <modules>
         <module>dbsyncer-connector-base</module>
-        <!-- P2: ES 7.17.x uses JDK-internal APIs removed in JDK 21 -->
-        <!-- <module>dbsyncer-connector-elasticsearch</module> -->
+        <module>dbsyncer-connector-elasticsearch</module>
         <module>dbsyncer-connector-file</module>
         <module>dbsyncer-connector-kafka</module>
         <module>dbsyncer-connector-mysql</module>

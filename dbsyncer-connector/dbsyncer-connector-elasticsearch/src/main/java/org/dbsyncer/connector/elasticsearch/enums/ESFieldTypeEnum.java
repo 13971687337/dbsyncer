@@ -4,7 +4,7 @@
 package org.dbsyncer.connector.elasticsearch.enums;
 
 import org.dbsyncer.common.util.StringUtil;
-import org.elasticsearch.ElasticsearchException;
+import org.dbsyncer.connector.elasticsearch.ElasticsearchException;
 
 import java.sql.Types;
 

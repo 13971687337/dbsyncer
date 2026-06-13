@@ -1,36 +1,26 @@
-/**
- * DBSyncer Copyright 2020-2023 All Rights Reserved.
- */
 package org.dbsyncer.connector.elasticsearch;
 
-import org.dbsyncer.connector.elasticsearch.api.EasyRestHighLevelClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.dbsyncer.connector.elasticsearch.config.ESConfig;
+import org.dbsyncer.connector.elasticsearch.ElasticsearchException;
 import org.dbsyncer.connector.elasticsearch.util.ESUtil;
+import org.dbsyncer.connector.elasticsearch.ElasticsearchException;
 import org.dbsyncer.sdk.connector.ConnectorInstance;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.Version;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.core.MainResponse;
 
-/**
- * ES连接器实例
- *
- * @Author AE86
- * @Version 1.0.0
- * @Date 2023-11-25 23:10
- */
-public final class ESConnectorInstance implements ConnectorInstance<ESConfig, EasyRestHighLevelClient> {
+
+public final class ESConnectorInstance implements ConnectorInstance<ESConfig, ElasticsearchClient> {
     private ESConfig config;
-    private EasyRestHighLevelClient client;
+    private ElasticsearchClient client;
+    private String version;
 
     public ESConnectorInstance(ESConfig config) {
         this.config = config;
-        this.client = ESUtil.getConnection(config);
+        this.client = ESUtil.getClient(config);
         try {
-            MainResponse info = client.info(RequestOptions.DEFAULT);
-            client.setVersion(Version.fromString(info.getVersion().getNumber()));
+            this.version = client.info().version().number();
         } catch (Exception e) {
-            throw new ElasticsearchException(String.format("获取ES版本信息异常 %s, %s", config.getUrl(), e.getMessage()));
+            throw new ElasticsearchException(
+                    String.format("获取ES版本信息异常 %s, %s", config.getUrl(), e.getMessage()));
         }
     }
 
@@ -50,12 +40,12 @@ public final class ESConnectorInstance implements ConnectorInstance<ESConfig, Ea
     }
 
     @Override
-    public EasyRestHighLevelClient getConnection() {
+    public ElasticsearchClient getConnection() {
         return client;
     }
 
-    public Version getVersion() {
-        return client.getVersion();
+    public String getVersion() {
+        return version;
     }
 
     @Override

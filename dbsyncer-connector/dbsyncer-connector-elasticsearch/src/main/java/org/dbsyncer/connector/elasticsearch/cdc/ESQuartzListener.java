@@ -7,13 +7,14 @@ import org.dbsyncer.common.util.CollectionUtils;
 import org.dbsyncer.common.util.JsonUtil;
 import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.connector.elasticsearch.ElasticsearchConnector;
+import org.dbsyncer.connector.elasticsearch.ElasticsearchException;
 import org.dbsyncer.sdk.constant.ConnectorConstant;
 import org.dbsyncer.sdk.enums.QuartzFilterEnum;
 import org.dbsyncer.sdk.listener.AbstractQuartzListener;
 import org.dbsyncer.sdk.listener.QuartzFilter;
 import org.dbsyncer.sdk.model.Filter;
 import org.dbsyncer.sdk.model.Point;
-import org.elasticsearch.ElasticsearchException;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
