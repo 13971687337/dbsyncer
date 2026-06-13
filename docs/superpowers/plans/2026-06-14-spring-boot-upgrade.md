@@ -6,7 +6,8 @@ A
 
 **Goal:** Upgrade DBSyncer from Spring Boot 2.5.14 / JDK 8 to Spring Boot 3.5.x / JDK 21. Replace SimpleDataSource with HikariCP. Migrate tests to JUnit 5. Upgrade mssql-jdbc to JDK 21 compatible version. Update Dockerfile for JDK 21. Keep all existing functionality unchanged.
 
-**Architecture:** APPROACH B — upgrade + opportunistic improvements. POM versions first, then javax→jakarta automated replacement, then Spring Security 6 manual migration, then Thymeleaf validation, then HikariCP + JUnit 5 migration, then Dockerfile update, then p12 removal. Each task produces a compilable state. Tests run at baseline (SB 2.5) and post-upgrade (SB 3.5) for comparison.
+**Architecture:** AP
+PROACH B — upgrade + opportunistic improvements. POM versions first, then javax→jakarta automated replacement, then Spring Security 6 manual migration, then Thymeleaf validation, then HikariCP + JUnit 5 migration, then Dockerfile update, then p12 removal. Each task produces a compilable state. Tests run at baseline (SB 2.5) and post-upgrade (SB 3.5) for comparison.
 
 **Tech Stack:** Java 21, Spring Boot 3.5.3, Spring Security 6.x, Jakarta EE 10, HikariCP (replaces SimpleDataSource), JUnit 5 + vintage-engine, Thymeleaf 3.1, Log4j2 (SB-managed), Elasticsearch REST Client 7.17.28 (explicit lock), mssql-jdbc 12.8.1
 
