@@ -121,12 +121,14 @@ public class OpenApiController implements InitializingBean {
 
     private void initHandlerMapping() {
         parsePackage.put("/openapi/", "");
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping mapping = applicationContext.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         // 获取url与类和方法的对应信息
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         map.forEach((k, v) -> {
             PatternsRequestCondition condition = k.getPatternsCondition();
-            assert condition != null;
+            if (condition == null) {
+                return;
+            }
             Object[] array = condition.getPatterns().toArray();
             boolean filter;
             for (Map.Entry<String, String> obj : parsePackage.entrySet()) {

@@ -51,12 +51,14 @@ public class StorageSupportConfiguration {
                 if (!applicationConfig) {
                     continue;
                 }
-                Map<String, OriginTrackedValue> props = (Map<String, OriginTrackedValue>) propertySource.getSource();
-                props.forEach((k, v) -> {
-                    if (StringUtil.startsWith(k, PREFIX_STORAGE)) {
-                        properties.put(k, v.getValue());
-                    }
-                });
+                Object source = propertySource.getSource();
+                if (source instanceof Map) {
+                    ((Map<?, ?>) source).forEach((k, v) -> {
+                        if (k instanceof String && StringUtil.startsWith((String) k, PREFIX_STORAGE)) {
+                            properties.put(k, v instanceof OriginTrackedValue ? ((OriginTrackedValue) v).getValue() : v);
+                        }
+                    });
+                }
             }
         }
 

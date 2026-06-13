@@ -1,4 +1,6 @@
-A# Phase 1: Spring Boot 3.5.x + JDK 21 Upgrade Plan (APPROACH B)
+A
+
+# Phase 1: Spring Boot 3.5.x + JDK 21 Upgrade Plan (APPROACH B)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
