@@ -36,5 +36,6 @@
         <module>dbsyncer-connector-postgresql</module>
         <module>dbsyncer-connector-sqlite</module>
         <module>dbsyncer-connector-sqlserver</module>
+        <module>dbsyncer-connector-clickhouse</module>
     </modules>
 </project>

@@ -1,1 +1,3 @@
 org.dbsyncer.connector.mysql.MySQLConnector
+org.dbsyncer.connector.mysql.DorisConnector
+org.dbsyncer.connector.mysql.StarRocksConnector
