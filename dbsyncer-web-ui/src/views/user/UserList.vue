@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="toolbar"><h3>用户管理</h3></div>
+    <div class="toolbar">
+      <h3>用户管理</h3>
+      <el-button type="primary" @click="router.push('/users/add')">添加用户</el-button>
+    </div>
     <el-table :data="items" v-loading="loading" stripe>
       <el-table-column prop="username" label="用户名" />
       <el-table-column prop="roleCode" label="角色" width="150" />
@@ -17,8 +20,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchUser, removeUser } from '@/api/user'
+
+const router = useRouter()
 
 const loading = ref(false)
 const items = ref<any[]>([])
@@ -31,7 +37,7 @@ onMounted(async () => {
   } finally { loading.value = false }
 })
 
-function handleEdit(row: any) { /* TODO */ }
+function handleEdit(row: any) { router.push('/users/' + encodeURIComponent(row.username) + '/edit') }
 function handleRemove(row: any) {
   ElMessageBox.confirm('确定删除?', '提示', { type: 'warning' }).then(async () => {
     await removeUser(row.id)
