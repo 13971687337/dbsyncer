@@ -9,7 +9,7 @@ import org.dbsyncer.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,10 +28,15 @@ public class SystemController extends BaseController {
     @Resource
     private SystemConfigService systemConfigService;
 
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        model.put("config", systemConfigService.getSystemConfigVo());
-        return "system/list";
+    @GetMapping("")
+    @ResponseBody
+    public RestResult index() {
+        try {
+            return RestResult.restSuccess(systemConfigService.getSystemConfigVo());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
     }
 
     @PostMapping("/edit")

@@ -24,6 +24,9 @@
         <el-menu-item index="/monitor">
           <el-icon><DataLine /></el-icon><span>性能监控</span>
         </el-menu-item>
+        <el-menu-item index="/notifications">
+          <el-icon><Bell /></el-icon><span>告警通知</span>
+        </el-menu-item>
         <el-menu-item index="/plugins">
           <el-icon><SetUp /></el-icon><span>插件管理</span>
         </el-menu-item>
@@ -81,6 +84,7 @@ const activeMenu = computed(() => {
   if (path.startsWith('/connectors')) return '/connectors'
   if (path.startsWith('/mappings')) return '/mappings'
   if (path.startsWith('/users')) return '/users'
+  if (path.startsWith('/notifications')) return '/notifications'
   return path
 })
 

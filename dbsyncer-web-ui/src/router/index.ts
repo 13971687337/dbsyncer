@@ -25,6 +25,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'users/add', name: 'UserAdd', component: () => import('@/views/user/UserAdd.vue'), meta: { title: '添加用户' } },
       { path: 'users/:username/edit', name: 'UserEdit', component: () => import('@/views/user/UserEdit.vue'), meta: { title: '编辑用户' } },
       { path: 'system', name: 'SystemConfig', component: () => import('@/views/system/SystemConfig.vue'), meta: { title: '系统配置' } },
+      { path: 'notifications', name: 'Notifications', component: () => import('@/views/notify/NotifyView.vue'), meta: { title: '告警通知' } },
     ],
   },
 ]
