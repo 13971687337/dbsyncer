@@ -66,6 +66,27 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
+## 5. 前端 API 调用规范（dbsyncer-web-ui）
+
+**Vue 组件禁止直接调用 `request()`。** 所有 HTTP 请求必须通过 `src/api/` 下的对应模块函数发起。
+
+```typescript
+// ❌ 错误：Vue 组件中直接 import request 并调用
+import request from '@/utils/request'
+await request({ url: '/user/add', method: 'post', params: form })
+
+// ✅ 正确：在 src/api/<module>.ts 中定义函数，Vue 组件 import 函数调用
+import { addUser } from '@/api/user'
+await addUser(form)
+```
+
+**规则：**
+- `src/views/` 下的 `.vue` 文件不得出现 `import request from '@/utils/request'`
+- `src/views/` 下的 `.vue` 文件不得出现 `request(` 调用
+- 每个后端 API 路径（如 `/user/add`、`/connector/getConnectorTypeAll`）必须在 `src/api/` 对应模块中封装为导出函数
+- API 函数命名：`get*` 查询、`add*` 新增、`edit*` 修改、`remove*` 删除、`search*` 分页搜索
+- 检查命令：`grep -rn "import request\|request(" src/views/ --include="*.vue"` 必须返回空
+
 ## 语言规则
 
 - 所有给用户的回复使用**简体中文**
