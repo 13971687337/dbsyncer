@@ -37,7 +37,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import request from '@/utils/request'
+import { editUser, getUserInfo } from '@/api/user'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,11 +59,7 @@ const rules = {
 
 onMounted(async () => {
   try {
-    const res: any = await request({
-      url: '/user/getUserInfo.json',
-      method: 'get',
-      params: { username: route.params.username },
-    })
+    const res: any = await getUserInfo(route.params.username as string)
     if (res?.data) {
       const d = res.data
       form.username = d.username || ''
@@ -80,7 +76,7 @@ async function handleSave() {
   try {
     const data: Record<string, any> = { ...form }
     if (!data.password) delete data.password
-    await request({ url: '/user/edit', method: 'post', params: data })
+    await editUser(data)
     ElMessage.success('修改成功')
     router.push('/users')
   } catch { /* ignore */ } finally { saving.value = false }
