@@ -1881,7 +1881,7 @@ public class JGeometry implements Cloneable, Serializable {
                     var16 = new Double[var0.ordinates.length];
                     if (var0.linfo == 0) {
                         for(var14 = 0; var14 < var0.ordinates.length; ++var14) {
-                            var16[var14] = new Double(var0.ordinates[var14]);
+                            var16[var14] = Double.valueOf(var0.ordinates[var14]);
                         }
                     } else {
                         if (var0.dim == 2 || var0.dim == 3 && var0.linfo != 3 || var0.dim == 4 && var0.linfo != 3 && var0.linfo != 4) {
@@ -1893,7 +1893,7 @@ public class JGeometry implements Cloneable, Serializable {
                                 throw new SQLException("An invalid Double.NaN is found in LRS ordinates");
                             }
 
-                            var16[var14] = Double.isNaN(var0.ordinates[var14]) ? null : new Double(var0.ordinates[var14]);
+                            var16[var14] = Double.isNaN(var0.ordinates[var14]) ? null : Double.valueOf(var0.ordinates[var14]);
                         }
                     }
                 }

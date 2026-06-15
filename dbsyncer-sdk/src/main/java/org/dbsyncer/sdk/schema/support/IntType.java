@@ -31,7 +31,7 @@ public abstract class IntType extends AbstractDataType<Integer> {
         }
         if (val instanceof Boolean) {
             Boolean b = (Boolean) val;
-            return new Integer(b ? 1 : 0);
+            return Integer.valueOf(b ? 1 : 0);
         }
         return throwUnsupportedException(val, field);
     }
