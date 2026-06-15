@@ -27,7 +27,7 @@ const items = ref<any[]>([])
 onMounted(async () => {
   loading.value = true
   try {
-    const res: any = await searchTask('pageNum=1&pageSize=50')
+    const res: any = await searchTask({ pageNum: 1, pageSize: 50 })
     if (res?.data) items.value = res.data.data || []
   } finally { loading.value = false }
 })
