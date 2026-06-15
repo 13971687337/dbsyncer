@@ -19,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchUser, removeUser } from '@/api/user'
 
+const { proxy } = getCurrentInstance()
 const router = useRouter()
 
 const loading = ref(false)
@@ -37,12 +37,20 @@ onMounted(async () => {
   } finally { loading.value = false }
 })
 
+function loadData() {
+  loading.value = true
+  searchUser({ pageNum: 1, pageSize: 50 }).then((res: any) => {
+    if (res?.data) items.value = res.data.data || []
+  }).finally(() => { loading.value = false })
+}
+
 function handleEdit(row: any) { router.push('/users/' + encodeURIComponent(row.username) + '/edit') }
 function handleRemove(row: any) {
-  ElMessageBox.confirm('确定删除?', '提示', { type: 'warning' }).then(async () => {
-    await removeUser(row.id)
-    ElMessage.success('删除成功')
-    items.value = items.value.filter(i => i.id !== row.id)
+  proxy.$modal.confirm('确定删除该用户?').then(() => {
+    return removeUser(row.id)
+  }).then(() => {
+    loadData()
+    proxy.$modal.msgSuccess('删除成功')
   }).catch(() => {})
 }
 </script>
