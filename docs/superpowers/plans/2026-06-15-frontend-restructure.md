@@ -4,9 +4,10 @@
 
 **Goal:** 将 dbsyncer-web-ui 前端代码重构为 RuoYi 风格（request 封装、API 模块化、路由守卫），同时将后端认证从 Session 改为 JWT。
 
-**Architecture:** 前端新增 `utils/request.ts`（axios 拦截器链）、`utils/auth.ts`（js-cookie token 管理）、`permission.ts`（路由守卫），`api/` 目录按业务拆分；后端新增 JWT 工具类、JWT 认证过滤器、`/getInfo` 接口。渐进式推进：基础设施 → 认证流程 → 业务 API → 清理。
+**Architecture:** 前端新增 `utils/request.ts`（axios 拦截器链 + /dev-api 前缀）、`utils/auth.ts`（js-cookie token 管理）、`settings.ts`（RuoYi-Vue3 全局配置）、`permission.ts`（路由守卫 + 动态标题），`vite/plugins/`（auto-import/compression/setup-extend），`api/` 目录按业务拆分；后端新增 JWT 工具类、JWT 认证过滤器、`/getInfo` 接口。渐进式推进：基础设施 → vite 配置 → 后端 JWT → 认证流程 → 业务 API → 清理。
 
 **Tech Stack:** Vue 3 + TypeScript + Pinia + Element Plus + Axios + Vite；Spring Boot + Spring Security + JWT (jjwt)
+**Reference:** RuoYi-Vue3（`/Users/work2021/DataCenterRespo/opensource2026/RuoYi-Vue3`）
 
 ---
 
@@ -15,12 +16,14 @@
 **Files:**
 - Modify: `dbsyncer-web-ui/package.json`
 
-- [ ] **Step 1: 安装 js-cookie 和 nprogress**
+- [ ] **Step 1: 安装所有前端依赖**
 
 ```bash
 cd /Users/work2021/DataCenterRespo/hc-dbsync/dbsyncer-web-ui
 npm install js-cookie nprogress
 npm install -D @types/js-cookie @types/nprogress
+npm install -D unplugin-auto-import unplugin-vue-setup-extend-plus
+npm install -D vite-plugin-compression
 ```
 
 - [ ] **Step 2: 验证安装**
@@ -34,7 +37,7 @@ Expected: OK
 
 ```bash
 git add dbsyncer-web-ui/package.json dbsyncer-web-ui/package-lock.json
-git commit -m "chore: add js-cookie and nprogress dependencies
+git commit -m "chore: add js-cookie, nprogress, vite plugin dependencies
 
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
@@ -197,30 +200,60 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 5: 创建环境变量文件
+### Task 5: 创建环境变量文件（参考 RuoYi-Vue3 三文件模式）
 
 **Files:**
 - Create: `dbsyncer-web-ui/.env.development`
+- Create: `dbsyncer-web-ui/.env.staging`
 - Create: `dbsyncer-web-ui/.env.production`
-- Create: `dbsyncer-web-ui/src/vite-env.d.ts` (update)
+- Modify: `dbsyncer-web-ui/src/vite-env.d.ts`
 
 - [ ] **Step 1: 创建 .env.development**
 
 ```
-VITE_APP_BASE_API = 'http://127.0.0.1:18686'
+# 页面标题
 VITE_APP_TITLE = 'HC-DBSync'
+
+# 开发环境
+VITE_APP_ENV = 'development'
+
+# 开发环境接口前缀（Vite proxy 会 rewrite 到后端实际地址）
+VITE_APP_BASE_API = '/dev-api'
 ```
 
-- [ ] **Step 2: 创建 .env.production**
+- [ ] **Step 2: 创建 .env.staging**
 
 ```
-VITE_APP_BASE_API = ''
+# 页面标题
 VITE_APP_TITLE = 'HC-DBSync'
+
+# 测试环境
+VITE_APP_ENV = 'staging'
+
+# 测试环境接口前缀
+VITE_APP_BASE_API = '/stage-api'
+
+# 是否开启 gzip/brotli 压缩
+VITE_BUILD_COMPRESS = 'gzip'
 ```
 
-- [ ] **Step 3: 更新 vite-env.d.ts 添加类型声明**
+- [ ] **Step 3: 创建 .env.production**
 
-Read `dbsyncer-web-ui/src/vite-env.d.ts`, replace with:
+```
+# 页面标题
+VITE_APP_TITLE = 'HC-DBSync'
+
+# 生产环境
+VITE_APP_ENV = 'production'
+
+# 生产环境接口前缀
+VITE_APP_BASE_API = '/prod-api'
+
+# 是否开启 gzip/brotli 压缩
+VITE_BUILD_COMPRESS = 'gzip'
+```
+
+- [ ] **Step 4: 更新 vite-env.d.ts 添加类型声明**
 
 ```typescript
 /// <reference types="vite/client" />
@@ -232,8 +265,10 @@ declare module '*.vue' {
 }
 
 interface ImportMetaEnv {
-  readonly VITE_APP_BASE_API: string
   readonly VITE_APP_TITLE: string
+  readonly VITE_APP_ENV: string
+  readonly VITE_APP_BASE_API: string
+  readonly VITE_BUILD_COMPRESS?: string
 }
 
 interface ImportMeta {
@@ -241,18 +276,189 @@ interface ImportMeta {
 }
 ```
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add dbsyncer-web-ui/.env.development dbsyncer-web-ui/.env.production dbsyncer-web-ui/src/vite-env.d.ts
-git commit -m "feat: add env files for VITE_APP_BASE_API configuration
+git add dbsyncer-web-ui/.env.development dbsyncer-web-ui/.env.staging dbsyncer-web-ui/.env.production dbsyncer-web-ui/src/vite-env.d.ts
+git commit -m "feat: add env files — dev/staging/prod with RuoYi-Vue3 pattern
 
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
 
 ---
 
-### Task 6: 后端 — 添加 JWT 依赖
+### Task 6: 创建 src/settings.ts — 全局配置（参考 RuoYi-Vue3）
+
+**Files:**
+- Create: `dbsyncer-web-ui/src/settings.ts`
+
+- [ ] **Step 1: 创建 settings.ts**
+
+```typescript
+const settings: Settings = {
+  title: import.meta.env.VITE_APP_TITLE,
+  sideTheme: 'theme-dark',
+  showSettings: false,
+  navType: 1,
+  tagsView: false,
+  fixedHeader: true,
+  sidebarLogo: true,
+  dynamicTitle: false,
+  footerVisible: false,
+  footerContent: 'Copyright © 2024-2026 武汉互创联合科技. All Rights Reserved.',
+}
+
+export interface Settings {
+  /** 网页标题 */
+  title: string
+  /** 侧边栏主题 theme-dark / theme-light */
+  sideTheme: string
+  /** 是否显示右侧设置面板 */
+  showSettings: boolean
+  /** 菜单导航模式 1=纯左侧 2=混合 3=纯顶部 */
+  navType: number
+  /** 是否显示 tagsView 标签页 */
+  tagsView: boolean
+  /** 是否固定头部 */
+  fixedHeader: boolean
+  /** 是否显示侧边栏 Logo */
+  sidebarLogo: boolean
+  /** 是否显示动态标题 */
+  dynamicTitle: boolean
+  /** 是否显示底部版权 */
+  footerVisible: boolean
+  /** 底部版权文本 */
+  footerContent: string
+}
+
+export default settings
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add dbsyncer-web-ui/src/settings.ts
+git commit -m "feat: add settings.ts — global app configuration (RuoYi-Vue3 pattern)
+
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 7: 创建 utils/dynamicTitle.ts — 动态标题
+
+**Files:**
+- Create: `dbsyncer-web-ui/src/utils/dynamicTitle.ts`
+
+- [ ] **Step 1: 创建 dynamicTitle.ts**
+
+```typescript
+import defaultSettings from '@/settings'
+
+export function useDynamicTitle(): void {
+  document.title = defaultSettings.title
+}
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add dbsyncer-web-ui/src/utils/dynamicTitle.ts
+git commit -m "feat: add utils/dynamicTitle.ts — page title management
+
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 8: 创建 vite/plugins/ — 复用 RuoYi-Vue3 插件
+
+**Files:**
+- Create: `dbsyncer-web-ui/vite/plugins/index.ts`
+- Create: `dbsyncer-web-ui/vite/plugins/auto-import.ts`
+- Create: `dbsyncer-web-ui/vite/plugins/compression.ts`
+- Create: `dbsyncer-web-ui/vite/plugins/setup-extend.ts`
+
+- [ ] **Step 1: 创建 vite/plugins/index.ts**
+
+```typescript
+import vue from '@vitejs/plugin-vue'
+import createAutoImport from './auto-import'
+import createCompression from './compression'
+import createSetupExtend from './setup-extend'
+
+export default function createVitePlugins(viteEnv: Record<string, string>, isBuild: boolean) {
+  const vitePlugins = [vue()]
+  vitePlugins.push(createAutoImport())
+  vitePlugins.push(createSetupExtend())
+  if (isBuild) {
+    vitePlugins.push(...createCompression(viteEnv))
+  }
+  return vitePlugins
+}
+```
+
+- [ ] **Step 2: 创建 vite/plugins/auto-import.ts**
+
+```typescript
+import autoImport from 'unplugin-auto-import/vite'
+
+export default function createAutoImport() {
+  return autoImport({
+    imports: [
+      'vue',
+      'vue-router',
+      'pinia',
+    ],
+    dts: false,
+  })
+}
+```
+
+- [ ] **Step 3: 创建 vite/plugins/compression.ts**
+
+```typescript
+import compression from 'vite-plugin-compression'
+import type { Plugin } from 'vite'
+
+export default function createCompression(env: Record<string, string>): Plugin[] {
+  const { VITE_BUILD_COMPRESS } = env
+  const plugins: Plugin[] = []
+  if (VITE_BUILD_COMPRESS) {
+    const compressList = VITE_BUILD_COMPRESS.split(',')
+    if (compressList.includes('gzip')) {
+      plugins.push(compression({ ext: '.gz', deleteOriginFile: false }) as Plugin)
+    }
+    if (compressList.includes('brotli')) {
+      plugins.push(compression({ ext: '.br', algorithm: 'brotliCompress', deleteOriginFile: false }) as Plugin)
+    }
+  }
+  return plugins
+}
+```
+
+- [ ] **Step 4: 创建 vite/plugins/setup-extend.ts**
+
+```typescript
+import setupExtend from 'unplugin-vue-setup-extend-plus/vite'
+
+export default function createSetupExtend() {
+  return setupExtend({})
+}
+```
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add dbsyncer-web-ui/vite/plugins/
+git commit -m "feat: add vite/plugins — auto-import, compression, setup-extend (RuoYi-Vue3)
+
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 9: 后端 — 添加 JWT 依赖 (原 Task 6)
 
 **Files:**
 - Modify: `dbsyncer-web/pom.xml`
@@ -299,7 +505,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 7: 后端 — 创建 JWT 工具类
+### Task 10: 后端 — 创建 JWT 工具类
 
 **Files:**
 - Create: `dbsyncer-web/src/main/java/org/dbsyncer/web/security/JwtTokenUtil.java`
@@ -377,7 +583,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 8: 后端 — 创建 JWT 认证过滤器
+### Task 11: 后端 — 创建 JWT 认证过滤器
 
 **Files:**
 - Create: `dbsyncer-web/src/main/java/org/dbsyncer/web/security/JwtAuthenticationFilter.java`
@@ -455,7 +661,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 9: 后端 — 修改 WebAppConfig 支持 JWT
+### Task 12: 后端 — 修改 WebAppConfig 支持 JWT
 
 **Files:**
 - Modify: `dbsyncer-web/src/main/java/org/dbsyncer/web/config/WebAppConfig.java`
@@ -547,7 +753,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 10: 后端 — 创建 /getInfo 接口
+### Task 13: 后端 — 创建 /getInfo 接口
 
 **Files:**
 - Create/Modify: `dbsyncer-web/src/main/java/org/dbsyncer/web/controller/index/IndexController.java`
@@ -601,7 +807,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 11: 前端 — 创建 api/login.ts
+### Task 14: 前端 — 创建 api/login.ts
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/api/login.ts`
@@ -646,7 +852,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 12: 前端 — 重构 stores/auth.ts → stores/user.ts
+### Task 15: 前端 — 重构 stores/auth.ts → stores/user.ts
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/stores/user.ts`
@@ -719,37 +925,43 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 13: 前端 — 创建 permission.ts 路由守卫
+### Task 16: 前端 — 创建 permission.ts 路由守卫
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/permission.ts`
 
-- [ ] **Step 1: 创建 permission.ts**
+- [ ] **Step 1: 创建 permission.ts（参考 RuoYi-Vue3 路由守卫 + 动态标题）**
 
 ```typescript
 import router from './router'
 import { useUserStore } from '@/stores/user'
 import { getToken } from '@/utils/auth'
+import { useDynamicTitle } from '@/utils/dynamicTitle'
 import { ElMessage } from 'element-plus'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import { isRelogin } from '@/utils/request'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login']
+const whiteList = ['/login', '/register']
 
 router.beforeEach((to, _from, next) => {
   NProgress.start()
-  const token = getToken()
+  useDynamicTitle()
 
-  if (token) {
+  if (getToken()) {
     if (to.path === '/login') {
       next({ path: '/' })
       NProgress.done()
+    } else if (whiteList.includes(to.path)) {
+      next()
     } else {
       const userStore = useUserStore()
-      if (!userStore.name) {
+      if (userStore.roles.length === 0) {
+        isRelogin.show = true
         userStore.getInfo().then(() => {
+          isRelogin.show = false
           next({ ...to, replace: true })
         }).catch(() => {
           userStore.resetState()
@@ -787,7 +999,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 14: 前端 — 简化 router/index.ts
+### Task 17: 前端 — 简化 router/index.ts
 
 **Files:**
 - Modify: `dbsyncer-web-ui/src/router/index.ts`
@@ -840,7 +1052,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 15: 前端 — 改造 LoginView.vue
+### Task 18: 前端 — 改造 LoginView.vue
 
 **Files:**
 - Modify: `dbsyncer-web-ui/src/views/login/LoginView.vue`
@@ -895,7 +1107,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 16: 前端 — 改造 MainLayout.vue
+### Task 19: 前端 — 改造 MainLayout.vue
 
 **Files:**
 - Modify: `dbsyncer-web-ui/src/views/layout/MainLayout.vue`
@@ -935,7 +1147,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 17: 前端 — 改造 main.ts 导入 permission
+### Task 20: 前端 — 改造 main.ts 导入 permission
 
 **Files:**
 - Modify: `dbsyncer-web-ui/src/main.ts`
@@ -978,36 +1190,77 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 18: 前端 — 更新 vite.config.ts proxy
+### Task 21: 前端 — 重写 vite.config.ts（参考 RuoYi-Vue3）
 
 **Files:**
 - Modify: `dbsyncer-web-ui/vite.config.ts`
 
-- [ ] **Step 1: 补充 /license、/index、/getInfo 路径**
-
-Read and update the proxy regex — add `/license` to the alternation group and change target to use env var:
+- [ ] **Step 1: 重写 vite.config.ts，采用 RuoYi-Vue3 的 loadEnv + 插件工厂 + /dev-api 代理模式**
 
 ```typescript
-proxy: {
-  '^/(login|connector|mapping|monitor|task|user|plugin|config|system|openapi|app|index|tableGroup|license|getInfo)': {
-    target: 'http://127.0.0.1:18686',
-    changeOrigin: true,
-  },
-},
+import { defineConfig, loadEnv } from 'vite'
+import path from 'path'
+import createVitePlugins from './vite/plugins'
+
+const baseUrl = 'http://127.0.0.1:18686'
+
+export default defineConfig(({ mode, command }) => {
+  const env = loadEnv(mode, process.cwd())
+  const { VITE_APP_ENV } = env
+
+  return {
+    base: VITE_APP_ENV === 'production' ? '/' : '/',
+    plugins: createVitePlugins(env, command === 'build'),
+    resolve: {
+      alias: {
+        '~': path.resolve(__dirname, './'),
+        '@': path.resolve(__dirname, './src'),
+      },
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+    },
+    build: {
+      sourcemap: command === 'build' ? false : 'inline',
+      outDir: 'dist',
+      assetsDir: 'assets',
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
+        },
+      },
+    },
+    server: {
+      port: 5173,
+      host: true,
+      open: true,
+      proxy: {
+        '/dev-api': {
+          target: baseUrl,
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/dev-api/, ''),
+        },
+      },
+    },
+  }
+})
 ```
+
+Note: 用 `/dev-api` 前缀代理模式替代之前的 12 条路径列表。Vite 自动 strip 前缀后转发到后端。生产环境 nginx 同理处理。
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add dbsyncer-web-ui/vite.config.ts
-git commit -m "chore: add /license /getInfo to Vite proxy patterns
+git commit -m "refactor: rewrite vite.config.ts — RuoYi-Vue3 loadEnv + plugin factory + /dev-api proxy
 
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
 
 ---
 
-### Task 19: 前端 — 创建 api/connector.ts + 改造 ConnectorList.vue
+### Task 22: 前端 — 创建 api/connector.ts + 改造 ConnectorList.vue
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/api/connector.ts`
@@ -1103,7 +1356,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 20: 前端 — 创建 api/mapping.ts + 改造 MappingList.vue + MappingEdit.vue
+### Task 23: 前端 — 创建 api/mapping.ts + 改造 MappingList.vue + MappingEdit.vue
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/api/mapping.ts`
@@ -1238,7 +1491,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 21: 前端 — 创建剩余 API 模块 + 改造对应 Views
+### Task 24: 前端 — 创建剩余 API 模块 + 改造对应 Views
 
 **Files:**
 - Create: `dbsyncer-web-ui/src/api/monitor.ts`
@@ -1535,7 +1788,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 22: 清理 — 删除旧文件
+### Task 25: 清理 — 删除旧文件
 
 **Files:**
 - Delete: `dbsyncer-web-ui/src/api/index.ts`
@@ -1572,7 +1825,7 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 23: 验证 — TypeScript 编译检查
+### Task 26: 验证 — TypeScript 编译检查
 
 - [ ] **Step 1: 运行 vue-tsc 类型检查**
 
