@@ -44,7 +44,7 @@ async function loadData() {
 }
 
 function handleAdd() { router.push('/connectors/add') }
-function handleEdit(row: any) { /* TODO */ }
+function handleEdit(row: any) { router.push('/connectors/' + row.id + '/edit') }
 
 function handleTest(row: any) {
   testConnector(row.id).then(() => ElMessage.success('连接测试成功')).catch(() => ElMessage.error('连接测试失败'))
