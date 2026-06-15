@@ -183,3 +183,7 @@ VITE_APP_BASE_API = 'http://127.0.0.1:18686'
 5. 逐个模块改造：创建 `api/xxx.ts`，改造对应 `views/xxx.vue`
 6. 删除旧 `api/index.ts`
 7. 更新 `vite.config.ts` proxy（补充 `/license` 路径）
+
+## 后端新增接口
+
+- `GET /getInfo` — 返回当前用户信息、角色、权限（需新建，前端 getInfo() 调用）
