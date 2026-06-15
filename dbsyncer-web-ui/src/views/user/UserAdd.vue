@@ -34,11 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { addUser } from '@/api/user'
 
+const { proxy } = getCurrentInstance()
 const router = useRouter()
 const saving = ref(false)
 
@@ -59,11 +59,10 @@ const rules = {
 
 async function handleSave() {
   saving.value = true
-  try {
-    await addUser(form as Record<string, any>)
-    ElMessage.success('添加成功')
+  addUser(form as Record<string, any>).then(() => {
+    proxy.$modal.msgSuccess('添加成功')
     router.push('/users')
-  } catch { /* ignore */ } finally { saving.value = false }
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 </script>
 
