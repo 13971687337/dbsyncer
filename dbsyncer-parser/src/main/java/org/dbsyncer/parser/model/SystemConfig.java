@@ -97,6 +97,38 @@ public class SystemConfig extends ConfigModel {
      */
     private IpWhitelistConfig ipWhitelistConfig;
 
+    // ==================== 通知配置 ====================
+
+    /**
+     * 是否启用邮件通知
+     */
+    private boolean notifyEnabled;
+
+    /**
+     * SMTP服务器地址
+     */
+    private String notifySmtpHost = "smtp.qq.com";
+
+    /**
+     * 发件邮箱账户
+     */
+    private String notifyUsername;
+
+    /**
+     * 邮箱授权码
+     */
+    private String notifyPassword;
+
+    /**
+     * 同步失败时发送告警
+     */
+    private boolean notifyOnFailure = true;
+
+    /**
+     * 手动停止驱动时发送告警
+     */
+    private boolean notifyOnStop = true;
+
     public int getExpireDataDays() {
         return expireDataDays;
     }
@@ -216,4 +248,17 @@ public class SystemConfig extends ConfigModel {
     public void setIpWhitelistConfig(IpWhitelistConfig ipWhitelistConfig) {
         this.ipWhitelistConfig = ipWhitelistConfig;
     }
+
+    public boolean isNotifyEnabled() { return notifyEnabled; }
+    public void setNotifyEnabled(boolean notifyEnabled) { this.notifyEnabled = notifyEnabled; }
+    public String getNotifySmtpHost() { return notifySmtpHost; }
+    public void setNotifySmtpHost(String notifySmtpHost) { this.notifySmtpHost = notifySmtpHost; }
+    public String getNotifyUsername() { return notifyUsername; }
+    public void setNotifyUsername(String notifyUsername) { this.notifyUsername = notifyUsername; }
+    public String getNotifyPassword() { return notifyPassword; }
+    public void setNotifyPassword(String notifyPassword) { this.notifyPassword = notifyPassword; }
+    public boolean isNotifyOnFailure() { return notifyOnFailure; }
+    public void setNotifyOnFailure(boolean notifyOnFailure) { this.notifyOnFailure = notifyOnFailure; }
+    public boolean isNotifyOnStop() { return notifyOnStop; }
+    public void setNotifyOnStop(boolean notifyOnStop) { this.notifyOnStop = notifyOnStop; }
 }

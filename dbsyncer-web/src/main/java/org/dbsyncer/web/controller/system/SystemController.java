@@ -62,4 +62,39 @@ public class SystemController extends BaseController {
         }
     }
 
+    @GetMapping("/notify/config")
+    @ResponseBody
+    public RestResult getNotifyConfig() {
+        try {
+            return RestResult.restSuccess(systemConfigService.getSystemConfigVo());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
+    }
+
+    @PostMapping("/notify/config")
+    @ResponseBody
+    public RestResult saveNotifyConfig(HttpServletRequest request) {
+        try {
+            Map<String, String> params = getParams(request);
+            return RestResult.restSuccess(systemConfigService.edit(params));
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
+    }
+
+    @PostMapping("/notify/test")
+    @ResponseBody
+    public RestResult testNotify() {
+        try {
+            systemConfigService.testNotify();
+            return RestResult.restSuccess("测试邮件发送成功");
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
+    }
+
 }

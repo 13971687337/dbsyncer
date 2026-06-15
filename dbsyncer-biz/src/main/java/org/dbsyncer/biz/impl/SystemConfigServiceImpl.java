@@ -19,6 +19,7 @@ import org.dbsyncer.parser.LogType;
 import org.dbsyncer.parser.model.ConfigModel;
 import org.dbsyncer.parser.model.SystemConfig;
 import org.dbsyncer.manager.impl.PreloadTemplate;
+import org.dbsyncer.parser.MessageService;
 import org.dbsyncer.common.enums.FileSuffixEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,9 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     @Resource
     private AppConfig appConfig;
+
+    @Resource
+    private MessageService messageService;
 
     @Override
     public String edit(Map<String, String> params) {
@@ -137,5 +141,10 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     public RSAConfig createRSAConfig(int keyLength) {
         Assert.isTrue(keyLength >= 1024 && keyLength <= 8192, "密钥长度支持的范围[1024-8192]");
         return RSAUtil.createKeys(keyLength);
+    }
+
+    @Override
+    public void testNotify() {
+        messageService.sendMessage("测试通知", "这是一封来自 DBSyncer 的测试邮件，如果您收到此邮件，说明邮件通知配置正确。");
     }
 }

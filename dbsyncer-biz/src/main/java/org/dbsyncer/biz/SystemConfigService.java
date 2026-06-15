@@ -78,4 +78,9 @@ public interface SystemConfigService {
      * @return
      */
     RSAConfig createRSAConfig(int keyLength);
+
+    /**
+     * 发送测试通知邮件
+     */
+    void testNotify();
 }

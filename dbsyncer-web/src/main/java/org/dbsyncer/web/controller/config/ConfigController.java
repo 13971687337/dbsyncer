@@ -16,7 +16,6 @@ import org.dbsyncer.web.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,11 +53,15 @@ public class ConfigController {
     @Resource
     private SnowflakeIdWorker snowflakeIdWorker;
 
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        model.put("config", systemConfigService.getConfigModelAll());
-        model.put("fileSize", JsonUtil.objToJson(cacheService.getAll()).getBytes(Charset.defaultCharset()).length);
-        return "config/list";
+    @GetMapping("")
+    @ResponseBody
+    public RestResult index() {
+        try {
+            return RestResult.restSuccess(systemConfigService.getConfigModelAll());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
     }
 
     @PostMapping(value = "/upload")
