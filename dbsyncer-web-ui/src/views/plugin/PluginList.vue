@@ -49,11 +49,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getPlugins } from '@/api/plugin'
 import { getToken } from '@/utils/auth'
 
+const { proxy } = getCurrentInstance()
 const plugins = ref<any[]>([])
 const uploadUrl = (import.meta as any).env.VITE_APP_BASE_API + '/plugin/upload'
 const uploadHeaders = ref<Record<string, string>>({ Authorization: 'Bearer ' + getToken() })
@@ -66,11 +66,11 @@ onMounted(async () => {
 })
 
 function handleUploadSuccess() {
-  ElMessage.success('插件上传成功')
+  proxy.$modal.msgSuccess('插件上传成功')
   getPlugins().then((res: any) => { if (res?.data) plugins.value = res.data || [] })
 }
 function handleUploadError() {
-  ElMessage.error('上传失败')
+  proxy.$modal.msgError('上传失败')
 }
 </script>
 

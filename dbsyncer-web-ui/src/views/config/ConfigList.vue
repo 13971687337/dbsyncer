@@ -48,11 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getConfig } from '@/api/config'
 import { getToken } from '@/utils/auth'
 
+const { proxy } = getCurrentInstance()
 const configs = ref<any[]>([])
 const uploadUrl = (import.meta as any).env.VITE_APP_BASE_API + '/config/upload'
 const uploadHeaders = ref<Record<string, string>>({ Authorization: 'Bearer ' + getToken() })
@@ -69,7 +69,7 @@ function handleDownload() {
 }
 
 function handleUploadSuccess() {
-  ElMessage.success('上传成功')
+  proxy.$modal.msgSuccess('上传成功')
   getConfig().then((res: any) => { if (res?.data) configs.value = res.data || [] })
 }
 </script>
