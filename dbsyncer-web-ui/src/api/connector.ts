@@ -4,6 +4,14 @@ export function searchConnector(query: { pageNum: number; pageSize: number }) {
   return request({ url: '/connector/search', method: 'post', params: query })
 }
 
+export function getConnectorTypeAll() {
+  return request({ url: '/connector/getConnectorTypeAll', method: 'get' })
+}
+
+export function getConnectorPosition(id: string) {
+  return request({ url: '/connector/getPosition', method: 'get', params: { id } })
+}
+
 export function addConnector(data: Record<string, any>) {
   return request({ url: '/connector/add', method: 'post', params: data })
 }

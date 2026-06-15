@@ -31,8 +31,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { editConnector } from '@/api/connector'
-import request from '@/utils/request'
+import { editConnector, getConnectorPosition } from '@/api/connector'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,7 +49,7 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    const res: any = await request({ url: '/connector/getPosition', method: 'get', params: { id: route.params.id } })
+    const res: any = await getConnectorPosition(route.params.id as string)
     if (res?.data) {
       const d = res.data
       form.id = d.id || ''

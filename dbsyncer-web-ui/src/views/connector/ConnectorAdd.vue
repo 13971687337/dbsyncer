@@ -33,8 +33,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { addConnector } from '@/api/connector'
-import request from '@/utils/request'
+import { addConnector, getConnectorTypeAll } from '@/api/connector'
 
 const router = useRouter()
 const saving = ref(false)
@@ -50,7 +49,7 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    const res: any = await request({ url: '/connector/getConnectorTypeAll', method: 'get' })
+    const res: any = await getConnectorTypeAll()
     if (res?.data) connectorTypes.value = res.data || []
   } catch { /* ignore */ }
 })
