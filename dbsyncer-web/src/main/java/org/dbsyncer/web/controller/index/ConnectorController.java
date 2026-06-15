@@ -135,6 +135,17 @@ public class ConnectorController extends BaseController {
         }
     }
 
+    @GetMapping("/getConnectorTypeAll")
+    @ResponseBody
+    public RestResult getConnectorTypeAll() {
+        try {
+            return RestResult.restSuccess(connectorService.getConnectorTypeAll());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
+    }
+
     @GetMapping("/getDatabase")
     @ResponseBody
     public RestResult getDatabase(String id) {
