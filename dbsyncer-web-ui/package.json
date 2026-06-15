@@ -6,21 +6,29 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build:prod": "vue-tsc --noEmit && vite build",
+    "build:stage": "vue-tsc --noEmit && vite build --mode staging",
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.0",
-    "vue-router": "^4.4.0",
-    "pinia": "^2.2.0",
-    "element-plus": "^2.8.0",
     "@element-plus/icons-vue": "^2.3.0",
-    "axios": "^1.7.0"
+    "axios": "^1.7.0",
+    "element-plus": "^2.8.0",
+    "js-cookie": "^3.0.8",
+    "nprogress": "^0.2.0",
+    "pinia": "^2.2.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "@types/nprogress": "^0.2.3",
     "@vitejs/plugin-vue": "^5.1.0",
     "typescript": "~5.6.0",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-setup-extend-plus": "^1.0.1",
     "vite": "^6.0.0",
+    "vite-plugin-compression": "^0.5.1",
     "vue-tsc": "^2.1.0"
   }
 }
