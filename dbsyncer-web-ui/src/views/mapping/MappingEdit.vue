@@ -35,21 +35,23 @@
           <el-radio value="increment">增量</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item><el-button type="primary" @click="handleSave">保存</el-button></el-form-item>
+      <el-form-item><el-button type="primary" :loading="saving" @click="handleSave">保存</el-button></el-form-item>
     </el-form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+
 import { addMapping, editMapping } from '@/api/mapping'
 import { searchConnector } from '@/api/connector'
 
 const route = useRoute()
 const router = useRouter()
 const isNew = !route.params.id
+const { proxy } = getCurrentInstance()
+const saving = ref(false)
 const connectors = ref<any[]>([])
 const form = reactive({ name: '', sourceConnectorId: '', targetConnectorId: '', model: 'full' })
 
@@ -70,14 +72,12 @@ onMounted(async () => {
 })
 
 async function handleSave() {
-  try {
-    const url = isNew ? addMapping : editMapping
-    await url(form as Record<string, any>)
-    ElMessage.success('保存成功')
+  saving.value = true
+  const url = isNew ? addMapping : editMapping
+  url(form as Record<string, any>).then(() => {
+    proxy.$modal.msgSuccess('保存成功')
     router.push('/mappings')
-  } catch {
-    ElMessage.error('保存失败')
-  }
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 </script>
 
