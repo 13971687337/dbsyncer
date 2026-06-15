@@ -5,7 +5,7 @@ export function login(username: string, password: string) {
     url: '/login',
     headers: { isToken: false },
     method: 'post',
-    data: { username, password },
+    params: { username, password },
   })
 }
 

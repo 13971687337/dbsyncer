@@ -88,6 +88,28 @@ public class UserController extends BaseController {
         }
     }
 
+    @PostMapping("/search")
+    @ResponseBody
+    public RestResult search(HttpServletRequest request) {
+        try {
+            Map<String, String> params = getParams(request);
+            String currentUserName = getUserName();
+            List<UserInfoVo> all = userConfigService.getUserInfoAll(currentUserName);
+            int pageNum = Integer.parseInt(params.getOrDefault("pageNum", "1"));
+            int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "50"));
+            int start = (pageNum - 1) * pageSize;
+            int end = Math.min(start + pageSize, all.size());
+            List<UserInfoVo> page = start < all.size() ? all.subList(start, end) : java.util.Collections.emptyList();
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("data", page);
+            result.put("total", all.size());
+            return RestResult.restSuccess(result);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
+    }
+
     @PostMapping("/remove")
     @ResponseBody
     public RestResult remove(HttpServletRequest request) {

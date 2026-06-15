@@ -24,7 +24,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import api from '@/api'
+import { searchConnector, testConnector, removeConnector } from '@/api/connector'
 
 const router = useRouter()
 const loading = ref(false)
@@ -35,30 +35,27 @@ const pageNum = ref(1)
 async function loadData() {
   loading.value = true
   try {
-    const params = new URLSearchParams()
-    params.append('pageNum', String(pageNum.value))
-    params.append('pageSize', '10')
-    const res = await api.post('/connector/search', params)
-    if (res.data?.data) {
-      items.value = res.data.data.data || []
-      total.value = res.data.data.total || 0
+    const res: any = await searchConnector({ pageNum: pageNum.value, pageSize: 10 })
+    if (res?.data) {
+      items.value = res.data.data || []
+      total.value = res.data.total || 0
     }
   } finally { loading.value = false }
 }
 
-function handleAdd() {
-  router.push('/connectors/add')
-}
+function handleAdd() { router.push('/connectors/add') }
 function handleEdit(row: any) { /* TODO */ }
+
 function handleTest(row: any) {
-  api.post('/connector/test', null, { params: { id: row.id } }).then(() => ElMessage.success('连接测试成功')).catch(() => ElMessage.error('连接测试失败'))
+  testConnector(row.id).then(() => ElMessage.success('连接测试成功')).catch(() => ElMessage.error('连接测试失败'))
 }
+
 function handleRemove(row: any) {
   ElMessageBox.confirm('确定删除该连接器?', '提示', { type: 'warning' }).then(async () => {
-    await api.post('/connector/remove', null, { params: { id: row.id } })
+    await removeConnector(row.id)
     ElMessage.success('删除成功')
     loadData()
-  })
+  }).catch(() => {})
 }
 
 onMounted(loadData)
