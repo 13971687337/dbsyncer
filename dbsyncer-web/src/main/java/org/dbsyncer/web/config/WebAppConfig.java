@@ -32,7 +32,12 @@ import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.dbsyncer.web.security.JwtAuthenticationFilter;
+import org.dbsyncer.web.security.JwtTokenUtil;
 
 @Configuration
 @EnableWebSecurity
@@ -75,12 +80,20 @@ public class WebAppConfig {
                 .sessionFixation().migrateSession()
                 .maximumSessions(MAXIMUM_SESSIONS)
             );
-        return http.build();
+        return http
+            .addFilterBefore(jwtAuthenticationFilter(),
+                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         return new DBSyncerAuthenticationProvider();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(userConfigService);
     }
 
     @Bean
@@ -106,9 +119,15 @@ public class WebAppConfig {
     public SavedRequestAwareAuthenticationSuccessHandler loginSuccessHandler() {
         return new SavedRequestAwareAuthenticationSuccessHandler() {
             @Override
-            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-                String msg = String.format("%s 登录成功!", authentication.getPrincipal());
-                write(response, RestResult.restSuccess(msg));
+            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                                Authentication authentication) {
+                String username = (String) authentication.getPrincipal();
+                String token = JwtTokenUtil.createToken(username, Map.of());
+                String msg = String.format("%s 登录成功!", username);
+                Map<String, Object> data = new HashMap<>();
+                data.put("token", token);
+                data.put("msg", msg);
+                write(response, RestResult.restSuccess(data));
                 logger.info(msg);
             }
         };

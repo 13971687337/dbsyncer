@@ -25,7 +25,7 @@
     </el-aside>
     <el-container>
       <el-header>
-        <span class="user-info">{{ authStore.username }}</span>
+        <span class="user-info">{{ userStore.name }}</span>
         <el-button text @click="handleLogout">退出</el-button>
       </el-header>
       <el-main>
@@ -38,15 +38,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
+const userStore = useUserStore()
 const activeMenu = computed(() => route.path)
 
 async function handleLogout() {
-  await authStore.logout()
+  await userStore.doLogout()
   router.push('/login')
 }
 </script>

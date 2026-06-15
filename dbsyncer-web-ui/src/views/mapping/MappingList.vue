@@ -27,7 +27,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import api from '@/api'
+import { searchMapping, startMapping, stopMapping, removeMapping } from '@/api/mapping'
 
 const router = useRouter()
 const loading = ref(false)
@@ -38,27 +38,29 @@ const pageNum = ref(1)
 async function loadData() {
   loading.value = true
   try {
-    const params = new URLSearchParams()
-    params.append('pageNum', String(pageNum.value))
-    params.append('pageSize', '10')
-    const res = await api.post('/mapping/search', params)
-    if (res.data?.data) {
-      items.value = res.data.data.data || []
-      total.value = res.data.data.total || 0
+    const res: any = await searchMapping({ pageNum: pageNum.value, pageSize: 10 })
+    if (res?.data) {
+      items.value = res.data.data || []
+      total.value = res.data.total || 0
     }
   } finally { loading.value = false }
 }
 
 function handleAdd() { router.push('/mappings/add') }
 function handleEdit(row: any) { router.push('/mappings/' + row.id) }
-function handleStart(row: any) { api.post('/mapping/start', null, { params: { id: row.id } }).then(() => { ElMessage.success('启动成功'); loadData() }) }
-function handleStop(row: any) { api.post('/mapping/stop', null, { params: { id: row.id } }).then(() => { ElMessage.success('停止成功'); loadData() }) }
+
+function handleStart(row: any) {
+  startMapping(row.id).then(() => { ElMessage.success('启动成功'); loadData() }).catch(() => ElMessage.error('启动失败'))
+}
+function handleStop(row: any) {
+  stopMapping(row.id).then(() => { ElMessage.success('停止成功'); loadData() }).catch(() => ElMessage.error('停止失败'))
+}
 function handleRemove(row: any) {
   ElMessageBox.confirm('确定删除?', '提示', { type: 'warning' }).then(async () => {
-    await api.post('/mapping/remove', null, { params: { id: row.id } })
+    await removeMapping(row.id)
     ElMessage.success('删除成功')
     loadData()
-  })
+  }).catch(() => {})
 }
 
 onMounted(loadData)

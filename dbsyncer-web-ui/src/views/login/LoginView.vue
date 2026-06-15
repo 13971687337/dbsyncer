@@ -19,12 +19,13 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const authStore = useAuthStore()
+const route = useRoute()
+const userStore = useUserStore()
 const loading = ref(false)
 const form = reactive({ username: 'admin', password: 'admin' })
 const rules = {
@@ -35,11 +36,12 @@ const rules = {
 async function handleLogin() {
   loading.value = true
   try {
-    const ok = await authStore.login(form.username, form.password)
-    if (ok) { router.push('/'); ElMessage.success('登录成功') }
-    else { ElMessage.error('用户名或密码错误') }
+    await userStore.login(form.username, form.password)
+    ElMessage.success('登录成功')
+    const redirect = (route.query.redirect as string) || '/'
+    router.push(redirect)
   } catch {
-    ElMessage.error('登录失败')
+    ElMessage.error('用户名或密码错误')
   } finally {
     loading.value = false
   }
