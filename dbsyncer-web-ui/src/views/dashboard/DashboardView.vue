@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import api from '@/api'
+import { getMetric } from '@/api/monitor'
 
 const cpu = ref('--')
 const memory = ref('--')
@@ -25,9 +25,9 @@ const threads = ref('--')
 
 onMounted(async () => {
   try {
-    const res = await api.get('/monitor/metric')
-    if (res.data?.data) {
-      const d = res.data.data
+    const res: any = await getMetric()
+    if (res?.data) {
+      const d = res.data
       cpu.value = (d.cpu?.totalPercent || 0) + '%'
       memory.value = (d.memory?.jvmUsed || '--') + ' / ' + (d.memory?.jvmTotal || '--')
       threads.value = (d.threadsLive || 0) + ' / ' + (d.threadsPeak || 0)

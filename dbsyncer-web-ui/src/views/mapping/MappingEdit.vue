@@ -28,7 +28,8 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import api from '@/api'
+import { addMapping, editMapping } from '@/api/mapping'
+import { searchConnector } from '@/api/connector'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,19 +39,19 @@ const form = reactive({ name: '', sourceConnectorId: '', targetConnectorId: '', 
 
 onMounted(async () => {
   try {
-    const res = await api.post('/connector/search', new URLSearchParams({ pageNum: '1', pageSize: '100' }))
-    if (res.data?.data?.data) connectors.value = res.data.data.data
-  } catch {}
+    const res: any = await searchConnector({ pageNum: 1, pageSize: 100 })
+    if (res?.data?.data) connectors.value = res.data.data
+  } catch { /* ignore */ }
 })
 
 async function handleSave() {
-  const params = new URLSearchParams()
-  Object.entries(form).forEach(([k, v]) => params.append(k, v as string))
   try {
-    const url = isNew ? '/mapping/add' : '/mapping/edit'
-    await api.post(url, params)
+    const url = isNew ? addMapping : editMapping
+    await url(form as Record<string, any>)
     ElMessage.success('保存成功')
     router.push('/mappings')
-  } catch { ElMessage.error('保存失败') }
+  } catch {
+    ElMessage.error('保存失败')
+  }
 }
 </script>

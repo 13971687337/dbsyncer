@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import api from '@/api'
+import { searchTask, startTask, stopTask, deleteTask } from '@/api/task'
 
 const loading = ref(false)
 const items = ref<any[]>([])
@@ -27,14 +27,20 @@ const items = ref<any[]>([])
 onMounted(async () => {
   loading.value = true
   try {
-    const res = await api.post('/task/list', 'pageNum=1&pageSize=50')
-    if (res.data?.data) items.value = res.data.data.data || []
+    const res: any = await searchTask('pageNum=1&pageSize=50')
+    if (res?.data) items.value = res.data.data || []
   } finally { loading.value = false }
 })
 
-function handleStart(row: any) { api.post('/task/start?taskId=' + row.id).then(() => ElMessage.success('启动成功')) }
-function handleStop(row: any) { api.post('/task/stop?taskId=' + row.id).then(() => ElMessage.success('停止成功')) }
-function handleDelete(row: any) { api.get('/task/delete?taskId=' + row.id).then(() => ElMessage.success('删除成功')) }
+function handleStart(row: any) {
+  startTask(row.id).then(() => ElMessage.success('启动成功'))
+}
+function handleStop(row: any) {
+  stopTask(row.id).then(() => ElMessage.success('停止成功'))
+}
+function handleDelete(row: any) {
+  deleteTask(row.id).then(() => { ElMessage.success('删除成功'); items.value = items.value.filter(i => i.id !== row.id) })
+}
 </script>
 
 <style scoped>

@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import api from '@/api'
+import { queryData } from '@/api/monitor'
 
 const loading = ref(false)
 const dataItems = ref<any[]>([])
@@ -28,13 +28,10 @@ const pageNum = ref(1)
 async function loadData() {
   loading.value = true
   try {
-    const params = new URLSearchParams()
-    params.append('pageNum', String(pageNum.value))
-    params.append('pageSize', '20')
-    const res = await api.post('/monitor/queryData', params)
-    if (res.data?.data) {
-      dataItems.value = res.data.data.data || []
-      total.value = res.data.data.total || 0
+    const res: any = await queryData({ pageNum: pageNum.value, pageSize: 20 })
+    if (res?.data) {
+      dataItems.value = res.data.data || []
+      total.value = res.data.total || 0
     }
   } finally { loading.value = false }
 }
