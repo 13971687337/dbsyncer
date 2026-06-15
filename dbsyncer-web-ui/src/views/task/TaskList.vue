@@ -17,9 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { searchTask, startTask, stopTask, deleteTask } from '@/api/task'
+
+const { proxy } = getCurrentInstance()
 
 const loading = ref(false)
 const items = ref<any[]>([])
@@ -33,13 +34,13 @@ onMounted(async () => {
 })
 
 function handleStart(row: any) {
-  startTask(row.id).then(() => ElMessage.success('启动成功'))
+  startTask(row.id).then(() => proxy.$modal.msgSuccess('启动成功'))
 }
 function handleStop(row: any) {
-  stopTask(row.id).then(() => ElMessage.success('停止成功'))
+  stopTask(row.id).then(() => proxy.$modal.msgSuccess('停止成功'))
 }
 function handleDelete(row: any) {
-  deleteTask(row.id).then(() => { ElMessage.success('删除成功'); items.value = items.value.filter(i => i.id !== row.id) })
+  deleteTask(row.id).then(() => { proxy.$modal.msgSuccess('删除成功'); items.value = items.value.filter(i => i.id !== row.id) })
 }
 </script>
 

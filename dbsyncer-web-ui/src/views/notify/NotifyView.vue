@@ -95,11 +95,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { getNotifyConfig, saveNotifyConfig, testNotify } from '@/api/notify'
 import { searchUser } from '@/api/user'
 
+const { proxy } = getCurrentInstance()
 const saving = ref(false)
 const testing = ref(false)
 const recipients = ref<any[]>([])
@@ -134,24 +134,22 @@ onMounted(async () => {
   } catch { /* ignore */ }
 })
 
-async function handleSave() {
+function handleSave() {
   saving.value = true
-  try {
-    await saveNotifyConfig(form as Record<string, any>)
-    ElMessage.success('保存成功')
-  } catch { /* ignore */ } finally { saving.value = false }
+  saveNotifyConfig(form as Record<string, any>).then(() => {
+    proxy.$modal.msgSuccess('保存成功')
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 
-async function handleTest() {
+function handleTest() {
   if (!form.username || !form.password) {
-    ElMessage.warning('请先填写发件邮箱和授权码')
+    proxy.$modal.msgWarning('请先填写发件邮箱和授权码')
     return
   }
   testing.value = true
-  try {
-    await testNotify()
-    ElMessage.success('测试邮件发送成功，请检查收件箱')
-  } catch { /* ignore */ } finally { testing.value = false }
+  testNotify().then(() => {
+    proxy.$modal.msgSuccess('测试邮件发送成功，请检查收件箱')
+  }).catch(() => {}).finally(() => { testing.value = false })
 }
 </script>
 

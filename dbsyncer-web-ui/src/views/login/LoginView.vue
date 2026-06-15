@@ -18,10 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, getCurrentInstance } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
+
+const { proxy } = getCurrentInstance()
 
 const router = useRouter()
 const route = useRoute()
@@ -33,18 +34,17 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
-async function handleLogin() {
-  loading.value = true
-  try {
-    await userStore.login(form.username, form.password)
-    ElMessage.success('登录成功')
-    const redirect = (route.query.redirect as string) || '/'
-    router.push(redirect)
-  } catch {
-    ElMessage.error('用户名或密码错误')
-  } finally {
-    loading.value = false
+function handleLogin() {
+  if (!form.username || !form.password) {
+    proxy.$modal.msgWarning('请输入用户名和密码')
+    return
   }
+  userStore.login(form.username, form.password).then(() => {
+    proxy.$modal.msgSuccess('登录成功')
+    router.push('/')
+  }).catch(() => {
+    proxy.$modal.msgError('用户名或密码错误')
+  })
 }
 </script>
 

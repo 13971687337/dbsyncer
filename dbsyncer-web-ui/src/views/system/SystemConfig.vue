@@ -111,9 +111,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { getSystemInfo, editSystem, generateRSA } from '@/api/system'
+
+const { proxy } = getCurrentInstance()
 
 const saving = ref(false)
 const generating = ref(false)
@@ -152,29 +153,27 @@ onMounted(async () => {
   } catch { /* ignore */ }
 })
 
-async function handleSave() {
+function handleSave() {
   saving.value = true
-  try {
-    await editSystem(form as Record<string, any>)
-    ElMessage.success('修改成功')
-  } catch { /* ignore */ } finally { saving.value = false }
+  editSystem(form as Record<string, any>).then(() => {
+    proxy.$modal.msgSuccess('修改成功')
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 
-async function handleGenerateRSA() {
+function handleGenerateRSA() {
   generating.value = true
-  try {
-    const res: any = await generateRSA()
+  generateRSA().then((res: any) => {
     if (res?.data) {
       form.rsaPublicKey = res.data.publicKey || ''
       form.rsaPrivateKey = res.data.privateKey || ''
-      ElMessage.success('生成成功')
+      proxy.$modal.msgSuccess('生成成功')
     }
-  } catch { /* ignore */ } finally { generating.value = false }
+  }).catch(() => {}).finally(() => { generating.value = false })
 }
 
 function copyText(text: string, label: string) {
-  if (!text) { ElMessage.warning(label + '为空'); return }
-  navigator.clipboard.writeText(text).then(() => ElMessage.success('复制' + label + '成功'))
+  if (!text) { proxy.$modal.msgWarning(label + '为空'); return }
+  navigator.clipboard.writeText(text).then(() => proxy.$modal.msgSuccess('复制' + label + '成功'))
 }
 </script>
 
