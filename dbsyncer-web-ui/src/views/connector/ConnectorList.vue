@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchConnector, testConnector, removeConnector } from '@/api/connector'
 
+const { proxy } = getCurrentInstance()
 const router = useRouter()
 const loading = ref(false)
 const items = ref<any[]>([])
@@ -54,14 +54,17 @@ function handleAdd() { router.push('/connectors/add') }
 function handleEdit(row: any) { router.push('/connectors/' + row.id + '/edit') }
 
 function handleTest(row: any) {
-  testConnector(row.id).then(() => ElMessage.success('连接测试成功')).catch(() => ElMessage.error('连接测试失败'))
+  testConnector(row.id).then(() => {
+    proxy.$modal.msgSuccess('连接测试成功')
+  }).catch(() => {})
 }
 
 function handleRemove(row: any) {
-  ElMessageBox.confirm('确定删除该连接器?', '提示', { type: 'warning' }).then(async () => {
-    await removeConnector(row.id)
-    ElMessage.success('删除成功')
+  proxy.$modal.confirm('确定删除该连接器?').then(() => {
+    return removeConnector(row.id)
+  }).then(() => {
     loadData()
+    proxy.$modal.msgSuccess('删除成功')
   }).catch(() => {})
 }
 
