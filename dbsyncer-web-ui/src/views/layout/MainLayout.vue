@@ -1,34 +1,65 @@
 <template>
   <el-container class="layout">
-    <el-aside width="220px">
-      <div class="logo">武汉互创联合科技</div>
-      <el-menu :default-active="activeMenu" router background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
+    <el-aside :width="sidebarWidth" class="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-text">DBSyncer</span>
+      </div>
+      <el-menu
+        :default-active="activeMenu"
+        router
+        background-color="#ffffff"
+        text-color="#595959"
+        active-text-color="#165DFF"
+        class="sidebar-menu"
+      >
         <el-menu-item index="/">
-          <el-icon><DataAnalysis /></el-icon><span>首页</span>
+          <el-icon><Odometer /></el-icon><span>仪表盘</span>
         </el-menu-item>
         <el-menu-item index="/connectors">
-          <el-icon><Connection /></el-icon><span>连接器</span>
+          <el-icon><Connection /></el-icon><span>连接管理</span>
         </el-menu-item>
         <el-menu-item index="/mappings">
-          <el-icon><Link /></el-icon><span>同步任务</span>
+          <el-icon><Link /></el-icon><span>驱动管理</span>
         </el-menu-item>
         <el-menu-item index="/monitor">
-          <el-icon><Monitor /></el-icon><span>监控</span>
+          <el-icon><Monitor /></el-icon><span>性能监控</span>
         </el-menu-item>
-        <el-menu-item index="/tasks">
-          <el-icon><List /></el-icon><span>任务</span>
+        <el-menu-item index="/plugins">
+          <el-icon><SetUp /></el-icon><span>插件管理</span>
+        </el-menu-item>
+        <el-menu-item index="/config">
+          <el-icon><Files /></el-icon><span>配置管理</span>
         </el-menu-item>
         <el-menu-item index="/users">
-          <el-icon><User /></el-icon><span>用户</span>
+          <el-icon><User /></el-icon><span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/system">
+          <el-icon><Setting /></el-icon><span>系统配置</span>
         </el-menu-item>
       </el-menu>
+      <div class="sidebar-footer">
+        <span class="sidebar-footer-text">Copyright &copy; 2026 DBSyncer</span>
+      </div>
     </el-aside>
     <el-container>
-      <el-header>
-        <span class="user-info">{{ userStore.name }}</span>
-        <el-button text @click="handleLogout">退出</el-button>
+      <el-header class="header">
+        <div class="header-right">
+          <el-dropdown trigger="click">
+            <span class="header-user">
+              <el-icon><UserFilled /></el-icon>
+              <span>{{ userStore.nickName || userStore.name }}</span>
+              <el-icon><ArrowDown /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="handleEditProfile">修改资料</el-dropdown-item>
+                <el-dropdown-item divided @click="handleLogout">注销</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
-      <el-main>
+      <el-main class="main-content">
         <router-view />
       </el-main>
     </el-container>
@@ -43,7 +74,19 @@ import { useUserStore } from '@/stores/user'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const activeMenu = computed(() => route.path)
+
+const sidebarWidth = '240px'
+const activeMenu = computed(() => {
+  const path = route.path
+  if (path.startsWith('/connectors')) return '/connectors'
+  if (path.startsWith('/mappings')) return '/mappings'
+  if (path.startsWith('/users')) return '/users'
+  return path
+})
+
+function handleEditProfile() {
+  router.push('/users/' + encodeURIComponent(userStore.name) + '/edit')
+}
 
 async function handleLogout() {
   await userStore.doLogout()
@@ -53,9 +96,83 @@ async function handleLogout() {
 
 <style scoped>
 .layout { height: 100vh; }
-.el-aside { background-color: #304156; overflow-x: hidden; }
-.logo { color: #fff; font-size: 20px; font-weight: bold; text-align: center; padding: 16px 0; }
-.el-header { background: #fff; border-bottom: 1px solid #e6e6e6; display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
-.el-main { background: #f0f2f5; padding: 20px; }
-.user-info { font-size: 14px; color: #606266; }
+
+.sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 8px;
+}
+.sidebar-logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+}
+
+.sidebar-menu {
+  flex: 1;
+  border-right: none !important;
+  overflow-y: auto;
+}
+
+.sidebar-menu .el-menu-item {
+  margin: 2px 8px;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+}
+.sidebar-menu .el-menu-item:hover {
+  background-color: rgba(22, 93, 255, 0.05) !important;
+}
+.sidebar-menu .el-menu-item.is-active {
+  background-color: rgba(22, 93, 255, 0.1) !important;
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e8e8e8;
+}
+.sidebar-footer-text {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 56px;
+  padding: 0 20px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #595959;
+  font-size: 14px;
+}
+
+.main-content {
+  background: #fafafa;
+  padding: 20px;
+  overflow-y: auto;
+}
 </style>
