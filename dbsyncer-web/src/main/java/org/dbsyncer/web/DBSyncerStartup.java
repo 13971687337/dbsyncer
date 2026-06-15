@@ -22,10 +22,10 @@ import java.util.Properties;
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "org.dbsyncer", exclude = {DataSourceAutoConfiguration.class})
-public class Application {
+public class DBSyncerStartup {
 
     public static void main(String[] args) throws IOException {
-        SpringApplication application = new SpringApplication(Application.class);
+        SpringApplication application = new SpringApplication(DBSyncerStartup.class);
         setProperties(application);
         application.run(args);
     }

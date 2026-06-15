@@ -17,7 +17,7 @@ fi
 sleep 0.3
 
 # kill process
-APP="org.dbsyncer.web.Application" 
+APP="org.dbsyncer.web.DBSyncerStartup" 
 PROCESS="`ps -ef|grep java|grep ${APP}|awk '{print $2}'`"
 if [[ -n ${PROCESS} ]]; then
   for p in ${PROCESS};

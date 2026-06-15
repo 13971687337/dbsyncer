@@ -16,7 +16,7 @@ if [ ! -f ${CONFIG_PATH} ]; then
 fi
 
 # check process
-APP="org.dbsyncer.web.Application" 
+APP="org.dbsyncer.web.DBSyncerStartup" 
 PROCESS="`ps -ef|grep java|grep ${APP}|awk '{print $2}'`"
 if [[ -n ${PROCESS} ]]; then
   echo "The app already started.";
