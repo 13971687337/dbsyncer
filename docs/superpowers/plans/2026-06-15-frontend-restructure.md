@@ -26,18 +26,36 @@ npm install -D unplugin-auto-import unplugin-vue-setup-extend-plus
 npm install -D vite-plugin-compression
 ```
 
-- [ ] **Step 2: 验证安装**
+- [ ] **Step 2: 更新 package.json scripts（参考 RuoYi-Vue3）**
+
+修改 `"scripts"` 字段：
+
+```json
+"scripts": {
+  "dev": "vite",
+  "build:prod": "vue-tsc --noEmit && vite build",
+  "build:stage": "vue-tsc --noEmit && vite build --mode staging",
+  "preview": "vite preview"
+}
+```
+
+变更：
+- 旧 `"build"` → `"build:prod"`（生产构建，保留 vue-tsc 类型检查）
+- 新增 `"build:stage"` → `vite build --mode staging`（测试环境构建）
+- `vue-tsc --noEmit` 替代 `vue-tsc`（只检查类型不输出，更快）
+
+- [ ] **Step 3: 验证安装**
 
 ```bash
 node -e "require('js-cookie'); require('nprogress'); console.log('OK')"
 ```
 Expected: OK
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add dbsyncer-web-ui/package.json dbsyncer-web-ui/package-lock.json
-git commit -m "chore: add js-cookie, nprogress, vite plugin dependencies
+git commit -m "chore: add dependencies and update scripts — RuoYi-Vue3 pattern
 
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
@@ -727,7 +745,8 @@ public SavedRequestAwareAuthenticationSuccessHandler loginSuccessHandler() {
             String msg = String.format("%s 登录成功!", username);
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);
-            write(response, RestResult.restSuccess(data, msg));
+            data.put("msg", msg);
+            write(response, RestResult.restSuccess(data));
             logger.info(msg);
         }
     };
@@ -1851,3 +1870,29 @@ git commit -m "fix: type errors and build issues from refactoring
 
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
+
+---
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | SELECTIVE_EXPANSION: +settings.ts, +env staging, +vite plugins, +dynamicTitle |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 2 issues: 1 P1 fixed (RestResult.restSuccess signature), 1 P2 noted (401 relogin on failed login) |
+
+**CODEX:** skipped (Codex not available)
+**VERDICT:** CEO + ENG CLEARED — ready to implement
+
+**NOT in scope:**
+- Backend `/logout` endpoint changes (existing already works)
+- E2E tests (plan covers vue-tsc + vite build verification)
+- Dynamic sidebar menu from backend (static menu kept)
+- TagsView / breadcrumb components (deferred to future PR)
+
+**What already exists (reused):**
+- `WebAppConfig.java` auth provider + logout handler — kept, adds JWT filter before form login
+- `RestResult` response wrapper — used throughout, no change needed
+- Existing view templates — only `<script setup>` sections modified
+- Existing Element Plus icons registration in `main.ts` — kept
+
+NO UNRESOLVED DECISIONS
