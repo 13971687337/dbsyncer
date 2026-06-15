@@ -9,7 +9,7 @@ import org.dbsyncer.common.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,11 +37,15 @@ public class PluginController {
     @Resource
     private AppConfig appConfig;
 
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        model.put("plugins", pluginService.getPluginAll());
-        model.put("version", appConfig.getVersion());
-        return "plugin/list";
+    @GetMapping("")
+    @ResponseBody
+    public RestResult list() {
+        try {
+            return RestResult.restSuccess(pluginService.getPluginAll());
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return RestResult.restFail(e.getMessage());
+        }
     }
 
     @PostMapping(value = "/upload")
