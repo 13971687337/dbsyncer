@@ -38,12 +38,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchMapping, startMapping, stopMapping, removeMapping } from '@/api/mapping'
 
 const router = useRouter()
+const { proxy } = getCurrentInstance() as any
 const loading = ref(false)
 const items = ref<any[]>([])
 const total = ref(0)
@@ -64,16 +64,25 @@ function handleAdd() { router.push('/mappings/add') }
 function handleEdit(row: any) { router.push('/mappings/' + row.id) }
 
 function handleStart(row: any) {
-  startMapping(row.id).then(() => { ElMessage.success('启动成功'); loadData() }).catch(() => ElMessage.error('启动失败'))
-}
-function handleStop(row: any) {
-  stopMapping(row.id).then(() => { ElMessage.success('停止成功'); loadData() }).catch(() => ElMessage.error('停止失败'))
-}
-function handleRemove(row: any) {
-  ElMessageBox.confirm('确定删除?', '提示', { type: 'warning' }).then(async () => {
-    await removeMapping(row.id)
-    ElMessage.success('删除成功')
+  startMapping(row.id).then(() => {
     loadData()
+    proxy.$modal.msgSuccess('启动成功')
+  }).catch(() => {})
+}
+
+function handleStop(row: any) {
+  stopMapping(row.id).then(() => {
+    loadData()
+    proxy.$modal.msgSuccess('停止成功')
+  }).catch(() => {})
+}
+
+function handleRemove(row: any) {
+  proxy.$modal.confirm('确定删除该任务?').then(() => {
+    return removeMapping(row.id)
+  }).then(() => {
+    loadData()
+    proxy.$modal.msgSuccess('删除成功')
   }).catch(() => {})
 }
 
