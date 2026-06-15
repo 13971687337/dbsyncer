@@ -16,3 +16,11 @@ velocity.log.1
 target/
 log.txt
 *.zip.DS_Store
+.codegraph/
+.doc/
+.logs/
+.DS_Store
+.claude/agents/
+.claude/commands/
+.claude/settings.json
+.claude/.edit-count*
