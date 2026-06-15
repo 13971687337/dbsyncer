@@ -7,9 +7,13 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
+import modal from '@/utils/modal'
 import './permission'
 
 const app = createApp(App)
+
+// 注册 $modal 全局对话框插件
+app.config.globalProperties.$modal = modal
 
 // Register all Element Plus icons
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
