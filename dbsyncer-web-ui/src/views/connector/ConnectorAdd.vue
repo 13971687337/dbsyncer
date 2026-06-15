@@ -30,11 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { addConnector, getConnectorTypeAll } from '@/api/connector'
 
+const { proxy } = getCurrentInstance()
 const router = useRouter()
 const saving = ref(false)
 const connectorTypes = ref<string[]>([])
@@ -56,15 +56,14 @@ onMounted(async () => {
 
 async function handleSave() {
   if (!form.name || !form.connectorType || !form.url || !form.username || !form.password) {
-    ElMessage.warning('请填写所有必填项')
+    proxy.$modal.msgWarning('请填写所有必填项')
     return
   }
   saving.value = true
-  try {
-    await addConnector(form as Record<string, any>)
-    ElMessage.success('添加成功')
+  addConnector(form as Record<string, any>).then(() => {
+    proxy.$modal.msgSuccess('添加成功')
     router.push('/connectors')
-  } catch { /* ignore */ } finally { saving.value = false }
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 </script>
 

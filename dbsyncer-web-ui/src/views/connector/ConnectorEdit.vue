@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { editConnector, getConnectorPosition } from '@/api/connector'
 
+const { proxy } = getCurrentInstance()
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
@@ -63,13 +63,12 @@ onMounted(async () => {
 
 async function handleSave() {
   saving.value = true
-  try {
-    const data: Record<string, any> = { ...form }
-    if (!data.password) delete data.password
-    await editConnector(data)
-    ElMessage.success('修改成功')
+  const data: Record<string, any> = { ...form }
+  if (!data.password) delete data.password
+  editConnector(data).then(() => {
+    proxy.$modal.msgSuccess('修改成功')
     router.push('/connectors')
-  } catch { /* ignore */ } finally { saving.value = false }
+  }).catch(() => {}).finally(() => { saving.value = false })
 }
 </script>
 
