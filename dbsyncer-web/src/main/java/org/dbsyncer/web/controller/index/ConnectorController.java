@@ -2,14 +2,11 @@ package org.dbsyncer.web.controller.index;
 
 import org.dbsyncer.biz.ConnectorService;
 import org.dbsyncer.biz.vo.RestResult;
-import org.dbsyncer.parser.model.Connector;
 import org.dbsyncer.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,28 +24,6 @@ public class ConnectorController extends BaseController {
 
     @Resource
     private ConnectorService connectorService;
-
-    @GetMapping("/list")
-    public String pageList(HttpServletRequest request, ModelMap model) {
-        return "connector/list";
-    }
-
-    @GetMapping("/page/add")
-    public String pageAdd(HttpServletRequest request, ModelMap model) {
-        model.put("connectorTypes", connectorService.getConnectorTypeAll());
-        return "connector/add";
-    }
-
-    @GetMapping("/page/add{page}")
-    public String page(HttpServletRequest request, ModelMap model, @PathVariable("page") String page) {
-        return "connector/add" + page;
-    }
-
-    @GetMapping("/page/edit")
-    public String pageEdit(HttpServletRequest request, ModelMap model, String id) {
-        model.put("connector", connectorService.getConnector(id));
-        return "connector/edit";
-    }
 
     @PostMapping("/search")
     @ResponseBody

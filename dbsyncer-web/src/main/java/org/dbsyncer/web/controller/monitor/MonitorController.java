@@ -6,7 +6,6 @@ package org.dbsyncer.web.controller.monitor;
 import org.dbsyncer.biz.BizException;
 import org.dbsyncer.biz.ConnectorService;
 import org.dbsyncer.biz.DataSyncService;
-import org.dbsyncer.biz.MappingService;
 import org.dbsyncer.biz.MonitorService;
 import org.dbsyncer.biz.enums.MetricEnum;
 import org.dbsyncer.biz.model.AppReportMetric;
@@ -16,11 +15,9 @@ import org.dbsyncer.biz.vo.CpuVO;
 import org.dbsyncer.biz.vo.DiskSpaceVO;
 import org.dbsyncer.biz.vo.HistoryStackVo;
 import org.dbsyncer.biz.vo.MemoryVO;
-import org.dbsyncer.biz.vo.MetaVo;
 import org.dbsyncer.biz.vo.RestResult;
 import org.dbsyncer.common.util.CollectionUtils;
 import org.dbsyncer.common.util.DateFormatUtil;
-import org.dbsyncer.common.util.NumberUtil;
 import org.dbsyncer.manager.impl.PreloadTemplate;
 import org.dbsyncer.web.controller.BaseController;
 import org.dbsyncer.web.controller.monitor.impl.CpuValueFormatter;
@@ -35,7 +32,6 @@ import org.springframework.boot.actuate.health.SystemHealth;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,9 +75,6 @@ public class MonitorController extends BaseController {
     private ConnectorService connectorService;
 
     @Resource
-    private MappingService mappingService;
-
-    @Resource
     private PreloadTemplate preloadTemplate;
 
     @Resource
@@ -98,26 +91,6 @@ public class MonitorController extends BaseController {
 
     @Resource
     private GBValueFormatter gbValueFormatter;
-
-    @RequestMapping("")
-    public String index(HttpServletRequest request, ModelMap model) {
-        Map<String, String> params = getParams(request);
-        model.put("metaId", monitorService.getDefaultMetaId(params));
-        model.put("meta", monitorService.getMetaAll());
-        model.put("storageDataStatus", monitorService.getStorageDataStatusEnumAll());
-        model.put("dataStatus", NumberUtil.toInt(params.get("dataStatus"), -1));
-        model.put("pagingData", monitorService.queryData(params));
-        return "monitor/list.html";
-    }
-
-    @GetMapping("/page/retry")
-    public String page(ModelMap model, String metaId, String messageId) {
-        MetaVo metaVo = monitorService.getMetaVo(metaId);
-        model.put("meta", metaVo);
-        model.put("mapping", mappingService.getMapping(metaVo.getMappingId()));
-        model.put("message", dataSyncService.getMessageVo(metaId, messageId));
-        return "monitor/retry.html";
-    }
 
     @Scheduled(fixedRate = 5000)
     public void recordHistoryStackMetric() {

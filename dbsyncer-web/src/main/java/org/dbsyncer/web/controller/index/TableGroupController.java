@@ -1,17 +1,12 @@
 package org.dbsyncer.web.controller.index;
 
-import org.dbsyncer.biz.MappingService;
 import org.dbsyncer.biz.TableGroupService;
 import org.dbsyncer.biz.vo.RestResult;
-import org.dbsyncer.parser.model.TableGroup;
 import org.dbsyncer.sdk.SdkException;
 import org.dbsyncer.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,19 +24,6 @@ public class TableGroupController extends BaseController {
 
     @Resource
     private TableGroupService tableGroupService;
-
-    @Resource
-    private MappingService mappingService;
-
-    @GetMapping("/page/{page}")
-    public String page(ModelMap model, @PathVariable("page") String page, @RequestParam(value = "id") String id) {
-        TableGroup tableGroup = tableGroupService.getTableGroup(id);
-        model.put("tableGroup", tableGroup);
-        String mappingId = tableGroup.getMappingId();
-        model.put("mapping", mappingService.getMapping(mappingId));
-        initConfig(model);
-        return "mapping/" + page;
-    }
 
     @PostMapping("/search")
     @ResponseBody

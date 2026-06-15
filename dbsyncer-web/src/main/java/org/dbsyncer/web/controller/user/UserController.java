@@ -3,14 +3,12 @@ package org.dbsyncer.web.controller.user;
 import org.dbsyncer.biz.UserConfigService;
 import org.dbsyncer.biz.vo.RestResult;
 import org.dbsyncer.biz.vo.UserInfoVo;
-import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,14 +17,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 用户信息管理
  *
  * @author AE86
- * @ClassName: UserController
- * @date: 2017年7月7日 上午10:03:33
+ * @date 2017年7月7日 上午10:03:33
  */
 @Controller
 @RequestMapping(value = "/user")
@@ -36,27 +36,6 @@ public class UserController extends BaseController {
 
     @Resource
     private UserConfigService userConfigService;
-
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        model.put("currentUser", getUserInfoVo());
-        model.put("users", userConfigService.getUserInfoAll(getUserName()));
-        return "user/list";
-    }
-
-    @GetMapping("/page/add")
-    public String pageAdd(ModelMap model) {
-        return "user/add";
-    }
-
-    @GetMapping("/page/edit")
-    public String pageEdit(ModelMap model, String username) {
-        String currentUserName = getUserName();
-        username = StringUtil.isBlank(username) ? currentUserName : username;
-        model.put(UserConfigService.CURRENT_USER_NAME, currentUserName);
-        model.put("currentUser", userConfigService.getUserInfoVo(currentUserName, username));
-        return "user/edit";
-    }
 
     @GetMapping("/getUserInfo.json")
     @ResponseBody
@@ -99,8 +78,8 @@ public class UserController extends BaseController {
             int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "50"));
             int start = (pageNum - 1) * pageSize;
             int end = Math.min(start + pageSize, all.size());
-            List<UserInfoVo> page = start < all.size() ? all.subList(start, end) : java.util.Collections.emptyList();
-            Map<String, Object> result = new java.util.HashMap<>();
+            List<UserInfoVo> page = start < all.size() ? all.subList(start, end) : Collections.emptyList();
+            Map<String, Object> result = new HashMap<>();
             result.put("data", page);
             result.put("total", all.size());
             return RestResult.restSuccess(result);

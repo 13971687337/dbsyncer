@@ -12,7 +12,6 @@ import org.dbsyncer.connector.base.ConnectorFactory;
 import org.dbsyncer.parser.model.Connector;
 import org.dbsyncer.sdk.connector.ConnectorInstance;
 import org.dbsyncer.sdk.connector.DefaultConnectorServiceContext;
-import org.dbsyncer.sdk.connector.database.DatabaseConnectorInstance;
 import org.dbsyncer.sdk.model.CommonTask;
 import org.dbsyncer.sdk.model.MetaInfo;
 import org.dbsyncer.sdk.spi.TaskService;
@@ -20,7 +19,6 @@ import org.dbsyncer.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,42 +53,6 @@ public class TaskController extends BaseController {
 
     @Resource
     private ConnectorFactory connectorFactory;
-
-    /**
-     * 任务配置首页
-     */
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        return "task/list";
-    }
-
-    /**
-     * 添加任务页面
-     */
-    @GetMapping("/page/add")
-    public String pageAdd(ModelMap model) {
-        model.put("connectors", connectorService.getConnectorAll());
-        return "task/add";
-    }
-
-    /**
-     * 编辑任务页面
-     */
-    @GetMapping("/page/edit")
-    public String pageEdit(@RequestParam("id") String taskId, ModelMap model) {
-       model.put("connectors", connectorService.getConnectorAll());
-        model.put("taskId", taskId);
-        return "task/edit";
-    }
-
-    /**
-     * 任务执行结果页面
-     */
-    @GetMapping("/page/result")
-    public String pageResult(@RequestParam("taskId") String taskId, ModelMap model) {
-        model.put("taskId", taskId);
-        return "task/result";
-    }
 
     /**
      * 获取任务详情
@@ -303,95 +263,6 @@ public class TaskController extends BaseController {
             log.error("获取连接器类型失败", e);
             return RestResult.restFail("获取连接器类型失败: " + e.getMessage());
         }
-    }
-
-    /**
-     * 获取数据库列表
-     */
-    private List<String> getDatabaseList(ConnectorInstance connectorInstance) {
-        List<String> databases = new ArrayList<>();
-        try {
-            // 根据连接器类型获取数据库列表
-            String connectorType = connectorInstance.getConfig().getConnectorType().toLowerCase();
-
-            DatabaseConnectorInstance connection = (DatabaseConnectorInstance) connectorInstance.getConnection();
-            if (connectorType.contains("mysql")) {
-                // MySQL: SHOW DATABASES
-                databases = connection.execute(databaseTemplate -> {
-                    List<String> dbList = new ArrayList<>();
-                    try (ResultSet rs = databaseTemplate.getSimpleConnection().getConnection().createStatement().executeQuery("SHOW DATABASES")) {
-                        while (rs.next()) {
-                            String dbName = rs.getString(1);
-                            // 过滤系统数据库
-                            if (!isSystemDatabase(dbName)) {
-                                dbList.add(dbName);
-                            }
-                        }
-                    }
-                    return dbList;
-                });
-            } else if (connectorType.contains("postgresql")) {
-                // PostgreSQL: SELECT datname FROM pg_database
-                databases = connection.execute(databaseTemplate -> {
-                    List<String> dbList = new ArrayList<>();
-                    try (ResultSet rs = databaseTemplate.getSimpleConnection().getConnection().createStatement().executeQuery("SELECT datname FROM pg_database WHERE datistemplate = false")) {
-                        while (rs.next()) {
-                            String dbName = rs.getString(1);
-                            if (!isSystemDatabase(dbName)) {
-                                dbList.add(dbName);
-                            }
-                        }
-                    }
-                    return dbList;
-                });
-            } else if (connectorType.contains("oracle")) {
-                // Oracle: SELECT username FROM all_users
-                databases = connection.execute(databaseTemplate -> {
-                    List<String> dbList = new ArrayList<>();
-                    try (ResultSet rs = databaseTemplate.getSimpleConnection().getConnection().createStatement().executeQuery("SELECT username FROM all_users ORDER BY username")) {
-                        while (rs.next()) {
-                            String dbName = rs.getString(1);
-                            if (!isSystemDatabase(dbName)) {
-                                dbList.add(dbName);
-                            }
-                        }
-                    }
-                    return dbList;
-                });
-            } else if (connectorType.contains("sqlserver")) {
-                // SQL Server: SELECT name FROM sys.databases
-                databases = connection.execute(databaseTemplate -> {
-                    List<String> dbList = new ArrayList<>();
-                    try (ResultSet rs = databaseTemplate.getSimpleConnection().getConnection().createStatement().executeQuery("SELECT name FROM sys.databases WHERE database_id > 4")) {
-                        while (rs.next()) {
-                            String dbName = rs.getString(1);
-                            if (!isSystemDatabase(dbName)) {
-                                dbList.add(dbName);
-                            }
-                        }
-                    }
-                    return dbList;
-                });
-            } else {
-                // 其他数据库类型，返回默认数据库
-                databases.add("default_database");
-            }
-
-        } catch (Exception e) {
-            log.error("获取数据库列表异常", e);
-            databases.add("default_database");
-        }
-        return databases;
-    }
-
-    /**
-     * 判断是否为系统数据库
-     */
-    private boolean isSystemDatabase(String dbName) {
-        if (dbName == null) return true;
-
-        String lowerDbName = dbName.toLowerCase();
-        return lowerDbName.equals("information_schema") || lowerDbName.equals("mysql") || lowerDbName.equals("performance_schema") || lowerDbName.equals("sys") || lowerDbName.equals("postgres") || lowerDbName.equals("template0") || lowerDbName.equals("template1") || lowerDbName.equals("master") || lowerDbName.equals("tempdb") || lowerDbName.equals("model") || lowerDbName.equals("msdb");
     }
 
 }

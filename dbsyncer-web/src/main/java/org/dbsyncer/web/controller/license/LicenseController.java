@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,13 +75,6 @@ public class LicenseController extends BaseController {
     public static final String STATUS = "status";
     public static final String DATA = "data";
     public static final String MSG = "msg";
-
-    @RequestMapping("")
-    public String index(ModelMap model) {
-        model.put("key", licenseService.getKey());
-        model.put("productInfo", licenseService.getProductInfo());
-        return "license/list";
-    }
 
     @PostMapping(value = "/upload")
     @ResponseBody
