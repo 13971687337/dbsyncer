@@ -6,7 +6,14 @@
     </div>
     <el-table :data="items" v-loading="loading" stripe>
       <el-table-column prop="name" label="名称" />
-      <el-table-column prop="type" label="类型" width="120" />
+      <el-table-column label="类型" width="140">
+        <template #default="{ row }">
+          <div class="type-cell">
+            <img :src="`/img/${row.config?.connectorType || ''}.png`" class="type-icon" alt="" @error="onImgError" />
+            <span>{{ row.config?.connectorType || row.type }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="180" />
       <el-table-column label="操作" width="200">
         <template #default="{ row }">
@@ -59,8 +66,14 @@ function handleRemove(row: any) {
 }
 
 onMounted(loadData)
+
+function onImgError(e: Event) {
+  (e.target as HTMLImageElement).style.display = 'none'
+}
 </script>
 
 <style scoped>
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.type-cell { display: flex; align-items: center; gap: 6px; }
+.type-icon { width: 22px; height: 22px; flex-shrink: 0; }
 </style>

@@ -19,10 +19,10 @@
           <el-icon><Connection /></el-icon><span>连接管理</span>
         </el-menu-item>
         <el-menu-item index="/mappings">
-          <el-icon><Link /></el-icon><span>驱动管理</span>
+          <el-icon><Refresh /></el-icon><span>数据同步</span>
         </el-menu-item>
         <el-menu-item index="/monitor">
-          <el-icon><Monitor /></el-icon><span>性能监控</span>
+          <el-icon><DataLine /></el-icon><span>性能监控</span>
         </el-menu-item>
         <el-menu-item index="/plugins">
           <el-icon><SetUp /></el-icon><span>插件管理</span>

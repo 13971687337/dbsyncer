@@ -6,8 +6,22 @@
     </div>
     <el-table :data="items" v-loading="loading" stripe>
       <el-table-column prop="name" label="任务名称" />
-      <el-table-column prop="sourceConnectorName" label="数据源" width="150" />
-      <el-table-column prop="targetConnectorName" label="目标源" width="150" />
+      <el-table-column label="数据源" width="180">
+        <template #default="{ row }">
+          <div class="connector-cell">
+            <img :src="`/img/${row.sourceConnector?.config?.connectorType || ''}.png`" class="connector-icon" alt="" @error="onImgError" />
+            <span>{{ row.sourceConnector?.name || row.sourceConnectorName }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="目标源" width="180">
+        <template #default="{ row }">
+          <div class="connector-cell">
+            <img :src="`/img/${row.targetConnector?.config?.connectorType || ''}.png`" class="connector-icon" alt="" @error="onImgError" />
+            <span>{{ row.targetConnector?.name || row.targetConnectorName }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="model" label="同步方式" width="100" />
       <el-table-column label="操作" width="280">
         <template #default="{ row }">
@@ -64,8 +78,14 @@ function handleRemove(row: any) {
 }
 
 onMounted(loadData)
+
+function onImgError(e: Event) {
+  (e.target as HTMLImageElement).style.display = 'none'
+}
 </script>
 
 <style scoped>
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.connector-cell { display: flex; align-items: center; gap: 6px; }
+.connector-icon { width: 20px; height: 20px; flex-shrink: 0; }
 </style>

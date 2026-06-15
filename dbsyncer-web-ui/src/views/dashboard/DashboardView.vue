@@ -117,7 +117,10 @@
           <div v-if="connectors.length === 0" class="empty-block">暂无连接</div>
           <div v-for="c in connectors" :key="c.id" class="connector-card">
             <div class="connector-card-left">
-              <span class="connector-name">{{ c.name }}</span>
+              <div class="connector-name-row">
+                <img :src="`/img/${c.config?.connectorType || ''}.png`" class="connector-icon" alt="" @error="onImgError" />
+                <span class="connector-name">{{ c.name }}</span>
+              </div>
               <span class="connector-url" :title="c.config?.url">{{ c.config?.url }}</span>
             </div>
             <el-tag :type="c.running ? 'success' : 'danger'" size="small">{{ c.running ? '在线' : '离线' }}</el-tag>
@@ -278,6 +281,10 @@ onMounted(async () => {
     if (mRes?.data) mappings.value = mRes.data.data || []
   } catch { /* ignore */ }
 })
+
+function onImgError(e: Event) {
+  (e.target as HTMLImageElement).style.display = 'none'
+}
 </script>
 
 <style scoped>
@@ -322,6 +329,8 @@ onMounted(async () => {
 .connector-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
 .connector-card:last-child { border-bottom: none; }
 .connector-card-left { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.connector-name-row { display: flex; align-items: center; gap: 6px; }
+.connector-icon { width: 22px; height: 22px; flex-shrink: 0; }
 .connector-name { font-size: 14px; font-weight: 500; }
 .connector-url { font-size: 12px; color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
