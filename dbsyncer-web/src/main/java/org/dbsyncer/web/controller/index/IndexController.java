@@ -51,7 +51,7 @@ public class IndexController {
         Map<String, Object> user = new HashMap<>();
         user.put("userName", userInfo.getUsername());
         user.put("nickName", userInfo.getUsername());
-        user.put("userId", userInfo.getId());
+        user.put("userId", userInfo.getUsername());
         data.put("user", user);
         data.put("roles", Collections.singletonList(userInfo.getRoleCode()));
         data.put("permissions", Collections.emptyList());
