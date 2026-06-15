@@ -153,8 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { queryData, queryLog, clearData, clearLog, getMetric, syncMonitor } from '@/api/monitor'
 import { searchMapping } from '@/api/mapping'
 import VChart from 'vue-echarts'
@@ -164,6 +163,8 @@ import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/compon
 import { CanvasRenderer } from 'echarts/renderers'
 
 use([LineChart, PieChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
+
+const { proxy } = getCurrentInstance() as any
 
 const dataItems = ref<any[]>([])
 const dataTotal = ref(0)
@@ -234,26 +235,29 @@ async function loadMetaList() {
 }
 
 function handleClearLog() {
-  ElMessageBox.confirm('确定清空所有日志？', '提示', { type: 'warning' }).then(async () => {
-    await clearLog()
-    ElMessage.success('已清空')
+  proxy.$modal.confirm('确定清空所有日志？').then(() => {
+    return clearLog()
+  }).then(() => {
     loadLog()
+    proxy.$modal.msgSuccess('已清空')
   }).catch(() => {})
 }
 
 function handleClearData() {
-  ElMessageBox.confirm('确定清空所有同步数据？', '提示', { type: 'warning' }).then(async () => {
-    await syncMonitor()
-    ElMessage.success('已清空')
+  proxy.$modal.confirm('确定清空所有同步数据？').then(() => {
+    return syncMonitor()
+  }).then(() => {
     loadData()
+    proxy.$modal.msgSuccess('已清空')
   }).catch(() => {})
 }
 
 function handleRemoveData(row: any) {
-  ElMessageBox.confirm('确定删除该条记录？', '提示', { type: 'warning' }).then(async () => {
-    await clearData(row.id)
-    ElMessage.success('删除成功')
+  proxy.$modal.confirm('确定删除该条记录？').then(() => {
+    return clearData(row.id)
+  }).then(() => {
     loadData()
+    proxy.$modal.msgSuccess('删除成功')
   }).catch(() => {})
 }
 
