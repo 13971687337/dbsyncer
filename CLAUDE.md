@@ -87,6 +87,33 @@ await addUser(form)
 - API 函数命名：`get*` 查询、`add*` 新增、`edit*` 修改、`remove*` 删除、`search*` 分页搜索
 - 检查命令：`grep -rn "import request\|request(" src/views/ --include="*.vue"` 必须返回空
 
+### Promise 链模式
+
+用户操作（删除、保存、启停等）必须使用 `.then()` 链式调用，通过 `proxy.$modal` 弹出对话框和消息提示：
+
+```typescript
+import { getCurrentInstance } from 'vue'
+const { proxy } = getCurrentInstance()
+
+// 确认删除
+function handleDelete(row: any) {
+  proxy.$modal.confirm('确定删除?').then(() => {
+    return removeUser(row.id)
+  }).then(() => {
+    loadData()
+    proxy.$modal.msgSuccess('删除成功')
+  }).catch(() => {})
+}
+```
+
+规则：
+- 所有用户操作的 Promise 链末尾必须有 `.catch(() => {})`
+- API 调用使用 `return apiFunction()` 将 Promise 传给下一个 `.then()`
+- 所有 Vue 页面使用 `const { proxy } = getCurrentInstance()` 获取全局方法
+- `onMounted` 数据加载保留 `async/await`
+- 禁止在 Vue 组件中直接使用 `ElMessageBox`、`ElMessage`，统一使用 `proxy.$modal.*`
+- 检查命令：`grep -rn "ElMessageBox\|ElMessage\." src/views/ --include="*.vue"` 必须返回空
+
 ## 语言规则
 
 - 所有给用户的回复使用**简体中文**
