@@ -105,7 +105,7 @@ public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest,
 
     @Override
     protected String getPartitionKey(WriterRequest request) {
-        return request.getTableName();
+        return request.getTableName() + ":" + request.getEvent();
     }
 
     @Override
@@ -130,9 +130,8 @@ public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest,
 
     @Override
     protected boolean skipPartition(WriterRequest nextRequest, WriterResponse response) {
-        // 并发场景，同一条数据可能连续触发Insert > Delete > Insert，批处理任务中出现不同事件时，跳过分区处理
-        // 跳过表结构修改事件（保证表结构修改原子性）
-        return !StringUtil.equals(nextRequest.getEvent(), response.getEvent()) || ChangedEventTypeEnum.isDDL(response.getTypeEnum());
+        // 跳过表结构修改事件（保证表结构修改原子性），事件类型分离已由二级分区处理
+        return ChangedEventTypeEnum.isDDL(response.getTypeEnum());
     }
 
     @Override
