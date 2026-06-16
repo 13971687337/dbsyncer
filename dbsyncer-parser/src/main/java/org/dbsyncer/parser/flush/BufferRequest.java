@@ -13,4 +13,13 @@ public interface BufferRequest {
      * @return
      */
     String getMetaId();
+
+    /**
+     * 是否为栅栏标记（用于DDL事件在队列中插入屏障，消费端遇到时先清空累积数据再执行DDL）
+     *
+     * @return
+     */
+    default boolean isBarrier() {
+        return false;
+    }
 }

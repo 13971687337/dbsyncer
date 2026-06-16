@@ -13,6 +13,7 @@ import java.util.List;
 public class WriterRequest extends AbstractWriter implements BufferRequest {
 
     private final List<Object> row;
+    private boolean barrier;
 
     public WriterRequest(ChangedEvent event) {
         setTraceId(event.getTraceId());
@@ -31,6 +32,15 @@ public class WriterRequest extends AbstractWriter implements BufferRequest {
 
     public List<Object> getRow() {
         return row;
+    }
+
+    @Override
+    public boolean isBarrier() {
+        return barrier;
+    }
+
+    public void setBarrier(boolean barrier) {
+        this.barrier = barrier;
     }
 
 }

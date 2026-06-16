@@ -216,6 +216,25 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
         Map<String, Response> map = new ConcurrentHashMap<>();
         while (!queue.isEmpty() && batchCounter.get() < config.getBufferPullCount()) {
             Request poll = queue.poll();
+
+            // 遇到栅栏标记：先处理已累积数据，再单独执行DDL，然后继续处理后续数据
+            if (poll.isBarrier()) {
+                process(map);
+                map.clear();
+                String key = getPartitionKey(poll);
+                try {
+                    Response response = responseClazz.newInstance();
+                    partition(poll, response);
+                    Map<String, Response> barrierMap = new ConcurrentHashMap<>();
+                    barrierMap.put(key, response);
+                    process(barrierMap);
+                } catch (Exception e) {
+                    throw new ParserException(e);
+                }
+                batchCounter.incrementAndGet();
+                continue;
+            }
+
             String key = getPartitionKey(poll);
             Response response = map.compute(key, (k,v) -> {
                 if (v == null) {

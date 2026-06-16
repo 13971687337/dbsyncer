@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -107,22 +106,12 @@ public final class BufferActuatorRouter implements DisposableBean {
     }
 
     private void offer(AbstractBufferActuator actuator, ChangedEvent event) {
+        WriterRequest request = new WriterRequest(event);
         if (ChangedEventTypeEnum.isDDL(event.getType())) {
-            WriterRequest request = new WriterRequest(event);
-            // DDL事件，阻塞等待队列消费完成
-            while (actuator.isRunning(request)) {
-                if (actuator.getQueue().isEmpty()) {
-                    actuator.offer(request);
-                    return;
-                }
-                try {
-                    TimeUnit.MILLISECONDS.sleep(10);
-                } catch (InterruptedException ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }
+            // DDL事件：插入栅栏标记，消费端遇到时先清空累积数据再执行DDL
+            request.setBarrier(true);
         }
-        actuator.offer(new WriterRequest(event));
+        actuator.offer(request);
     }
 
     @Override
