@@ -287,23 +287,26 @@ public final class IncrementPuller extends AbstractPuller implements Application
     }
 
     /**
-     * WAL崩溃恢复：扫描WAL文件，重放未提交的记录。
-     * <p>恢复完成后，源端将从最后提交的binlog位点继续消费，保证不丢数据、不重复写入。</p>
+     * WAL原子提交恢复：扫描WAL文件，重放未提交的记录。
+     * <p>恢复完成后WAL文件被自动截断，源端从最后提交的binlog位点继续消费。</p>
+     * <p>重放的记录由binlog消费者重新处理，依赖目标端UPSERT保证幂等。</p>
      */
     private void recoverWal(String metaId) {
         try {
-            List<WalEntry> uncommitted = WalRecovery.recover(WAL_DIR, metaId);
+            WalRecovery.RecoveryResult result = WalRecovery.recover(WAL_DIR, metaId);
+            List<WalEntry> uncommitted = result.getUncommitted();
             if (uncommitted.isEmpty()) {
                 return;
             }
-            logger.info("WAL恢复开始: metaId={}, 未提交记录数={}", metaId, uncommitted.size());
+            logger.info("WAL恢复开始: metaId={}, 重放={}, 跳过={}, 损坏={}",
+                    metaId, result.getReplayed(), result.getSkipped(), result.getCorrupted());
             for (int i = 0; i < uncommitted.size(); i++) {
                 WalEntry entry = uncommitted.get(i);
                 logger.info("WAL恢复进度 [{}/{}]: table={}, event={}, binlog={}:{}",
                         i + 1, uncommitted.size(), entry.getTableName(),
                         entry.getEvent(), entry.getBinlogFile(), entry.getBinlogPosition());
             }
-            logger.info("WAL恢复完成: metaId={}, 共{}条未提交记录（将在下次binlog消费时重新处理）", metaId, uncommitted.size());
+            logger.info("WAL恢复完成: metaId={}, 共{}条未提交记录（将在下次binlog消费时重新处理，WAL已截断）", metaId, result.getReplayed());
         } catch (Exception e) {
             logger.error("WAL恢复异常: metaId={}", metaId, e);
         }

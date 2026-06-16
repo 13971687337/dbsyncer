@@ -288,7 +288,9 @@ public abstract class AbstractDatabaseConnector extends AbstractConnector implem
             fields.clear();
             fields.addAll(PrimaryKeyUtil.findExistPrimaryKeyFields(targetFields));
         } else if(context.isForceUpdate()){
-            // 开启覆盖
+            // Phase 2 commit: WAL恢复重放批次 → 写入必须UPSERT幂等
+            // MySQL: INSERT ... ON DUPLICATE KEY UPDATE
+            // PostgreSQL: INSERT ... ON CONFLICT ... DO UPDATE
             executeSql = context.getCommand().get(ConnectorConstant.OPERTION_UPSERT);
         } else if(isUpdate(event)) {
             // 修改操作

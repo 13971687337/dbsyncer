@@ -18,12 +18,15 @@ import org.springframework.util.Assert;
 import jakarta.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -133,22 +136,38 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
     public abstract void pull(Response response);
 
     /**
-     * 批量处理分区数据
+     * 两阶段批量处理分区数据（Two-Phase Commit）
+     * <p>Phase 1: pull(response) 写入目标端（内部先追加WAL，写入成功后再提交WAL标记）</p>
+     * <p>Phase 2: 如果写入失败，WAL记录保持未提交状态，崩溃恢复时将被重放（UPSERT幂等保证不重复）</p>
      *
-     * @param map
+     * @param map 分区数据
      */
     protected void process(Map<String, Response> map) {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            map.forEach((key, response) -> executor.submit(() -> {
-                long now = Instant.now().toEpochMilli();
+            List<Future<?>> futures = new ArrayList<>();
+            map.forEach((key, response) -> {
+                futures.add(executor.submit(() -> {
+                    long now = Instant.now().toEpochMilli();
+                    try {
+                        // Phase 1: 写入目标端（WAL追加在distributeTableGroup中完成）
+                        pull(response);
+                        // Phase 2: WAL提交在distributeTableGroup中写入成功后执行
+                    } catch (Exception e) {
+                        logger.error("批量写入失败 [{}]: {}", key, e.getMessage());
+                        // WAL记录保持未提交状态 → 崩溃恢复时将被重放（UPSERT幂等）
+                    }
+                    logger.info("[{}{}]{}, {}ms", key, response.getSuffixName(), response.getTaskSize(),
+                            (Instant.now().toEpochMilli() - now));
+                }));
+            });
+            // 等待所有分区写入完成
+            for (Future<?> f : futures) {
                 try {
-                    pull(response);
+                    f.get();
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                    logger.error(e.getMessage());
                 }
-                logger.info("[{}{}]{}, {}ms", key, response.getSuffixName(), response.getTaskSize(),
-                        (Instant.now().toEpochMilli() - now));
-            }));
+            }
         }
     }
 
