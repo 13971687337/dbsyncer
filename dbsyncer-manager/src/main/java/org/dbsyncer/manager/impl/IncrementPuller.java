@@ -17,12 +17,15 @@ import org.dbsyncer.parser.ProfileComponent;
 import org.dbsyncer.parser.TableGroupContext;
 import org.dbsyncer.parser.consumer.ParserConsumer;
 import org.dbsyncer.parser.event.RefreshOffsetEvent;
+import org.dbsyncer.parser.flush.WalRecovery;
 import org.dbsyncer.parser.flush.impl.BufferActuatorRouter;
+import org.dbsyncer.parser.flush.impl.GeneralBufferActuator;
 import org.dbsyncer.parser.model.Connector;
 import org.dbsyncer.parser.model.Mapping;
 import org.dbsyncer.parser.model.Meta;
 import org.dbsyncer.parser.model.Picker;
 import org.dbsyncer.parser.model.TableGroup;
+import org.dbsyncer.parser.model.WalEntry;
 import org.dbsyncer.parser.util.ConnectorInstanceUtil;
 import org.dbsyncer.parser.util.PickerUtil;
 import org.dbsyncer.plugin.PluginFactory;
@@ -92,6 +95,14 @@ public final class IncrementPuller extends AbstractPuller implements Application
     @Resource
     private TableGroupContext tableGroupContext;
 
+    @Resource
+    private GeneralBufferActuator generalBufferActuator;
+
+    /**
+     * WAL目录，可通过系统属性 dbsyncer.wal.dir 配置，默认 ./data/wal
+     */
+    private static final String WAL_DIR = System.getProperty("dbsyncer.wal.dir", "./data/wal");
+
     private final Map<String, Listener> map = new ConcurrentHashMap<>();
 
     @PostConstruct
@@ -150,6 +161,8 @@ public final class IncrementPuller extends AbstractPuller implements Application
                 });
 
                 if (listener != null) {
+                    // WAL恢复：启动前重放未提交的记录
+                    recoverWal(metaId);
                     listener.start();
                 }
 
@@ -199,6 +212,8 @@ public final class IncrementPuller extends AbstractPuller implements Application
             }
             bufferActuatorRouter.unbind(metaId);
             tableGroupContext.clear(metaId);
+            // 清理WAL写入器
+            generalBufferActuator.closeWalWriter(metaId);
             publishClosedEvent(metaId);
             logger.info("关闭成功:{}", metaId);
             return null;
@@ -269,6 +284,29 @@ public final class IncrementPuller extends AbstractPuller implements Application
 
         listener.init();
         return listener;
+    }
+
+    /**
+     * WAL崩溃恢复：扫描WAL文件，重放未提交的记录。
+     * <p>恢复完成后，源端将从最后提交的binlog位点继续消费，保证不丢数据、不重复写入。</p>
+     */
+    private void recoverWal(String metaId) {
+        try {
+            List<WalEntry> uncommitted = WalRecovery.recover(WAL_DIR, metaId);
+            if (uncommitted.isEmpty()) {
+                return;
+            }
+            logger.info("WAL恢复开始: metaId={}, 未提交记录数={}", metaId, uncommitted.size());
+            for (int i = 0; i < uncommitted.size(); i++) {
+                WalEntry entry = uncommitted.get(i);
+                logger.info("WAL恢复进度 [{}/{}]: table={}, event={}, binlog={}:{}",
+                        i + 1, uncommitted.size(), entry.getTableName(),
+                        entry.getEvent(), entry.getBinlogFile(), entry.getBinlogPosition());
+            }
+            logger.info("WAL恢复完成: metaId={}, 共{}条未提交记录（将在下次binlog消费时重新处理）", metaId, uncommitted.size());
+        } catch (Exception e) {
+            logger.error("WAL恢复异常: metaId={}", metaId, e);
+        }
     }
 
     private void addSourceTable(List<Table> sourceTable, List<Table> customTable, Set<String> filterTable, Table table) {

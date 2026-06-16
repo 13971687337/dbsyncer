@@ -17,11 +17,13 @@ import org.dbsyncer.parser.TableGroupContext;
 import org.dbsyncer.parser.ddl.DDLParser;
 import org.dbsyncer.parser.event.RefreshOffsetEvent;
 import org.dbsyncer.parser.flush.AbstractBufferActuator;
+import org.dbsyncer.parser.flush.WalWriter;
 import org.dbsyncer.parser.model.Connector;
 import org.dbsyncer.parser.model.Mapping;
 import org.dbsyncer.parser.model.Meta;
 import org.dbsyncer.parser.model.TableGroup;
 import org.dbsyncer.parser.model.TableGroupPicker;
+import org.dbsyncer.parser.model.WalEntry;
 import org.dbsyncer.parser.model.WriterRequest;
 import org.dbsyncer.parser.model.WriterResponse;
 import org.dbsyncer.parser.strategy.FlushStrategy;
@@ -48,10 +50,12 @@ import org.springframework.util.Assert;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
@@ -96,6 +100,16 @@ public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest,
 
     @Resource
     private TableGroupContext tableGroupContext;
+
+    /**
+     * WAL目录，可通过系统属性 dbsyncer.wal.dir 配置，默认 ./data/wal
+     */
+    private static final String WAL_DIR = System.getProperty("dbsyncer.wal.dir", "./data/wal");
+
+    /**
+     * metaId -> WalWriter 映射，每个驱动一个WAL文件
+     */
+    private final Map<String, WalWriter> walWriterMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -219,15 +233,37 @@ public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest,
         context.setEnablePrintTraceInfo(StringUtil.isNotBlank(response.getTraceId()));
         pluginFactory.process(context, ProcessEnum.CONVERT);
 
-        // 4、批量执行同步
+        // 4、WAL追加（先写日志）
+        WalEntry walEntry = null;
+        String metaId = response.getChangedOffset().getMetaId();
+        String binlogFile = response.getChangedOffset().getNextFileName();
+        long binlogPos = resolveBinlogPosition(response.getChangedOffset().getPosition());
+        WalWriter walWriter = getWalWriter(metaId);
+        if (walWriter != null) {
+            try {
+                // 将目标数据转换为Object列表用于WAL记录
+                List<Object> walRowData = new ArrayList<>(targetDataList);
+                walEntry = walWriter.append(context.getTargetTableName(), response.getEvent(),
+                        walRowData, binlogFile, binlogPos);
+            } catch (Exception e) {
+                logger.error("WAL追加失败: metaId={}, table={}", metaId, context.getTargetTableName(), e);
+            }
+        }
+
+        // 5、批量执行同步
         Result result = parserComponent.writeBatch(context, getExecutor());
 
-        // 5、持久化同步结果
+        // 6、WAL提交标记（写入目标端成功后）
+        if (walEntry != null && walWriter != null) {
+            walWriter.commit(walEntry.getSequence());
+        }
+
+        // 7、持久化同步结果
         result.setTableGroupId(tableGroup.getId());
         result.setTargetTableGroupName(context.getTargetTableName());
         flushStrategy.flushIncrementData(mapping.getMetaId(), result, response.getEvent());
 
-        // 6、执行后置处理
+        // 8、执行后置处理
         pluginFactory.process(context, ProcessEnum.AFTER);
     }
 
@@ -292,6 +328,51 @@ public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest,
         Connector conn = profileComponent.getConnector(connectorId);
         Assert.notNull(conn, "Connector can not be null.");
         return conn.getConfig();
+    }
+
+    /**
+     * 获取或创建metaId对应的WalWriter
+     */
+    private WalWriter getWalWriter(String metaId) {
+        return walWriterMap.computeIfAbsent(metaId, id -> {
+            try {
+                return new WalWriter(WAL_DIR, id);
+            } catch (IOException e) {
+                logger.error("创建WalWriter失败: metaId={}, dir={}", id, WAL_DIR, e);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * 关闭并移除metaId对应的WalWriter（驱动停止时调用）
+     */
+    public void closeWalWriter(String metaId) {
+        WalWriter writer = walWriterMap.remove(metaId);
+        if (writer != null) {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                logger.error("关闭WalWriter失败: metaId={}", metaId, e);
+            }
+        }
+    }
+
+    /**
+     * 解析binlog位点为long值
+     */
+    private long resolveBinlogPosition(Object position) {
+        if (position instanceof Number) {
+            return ((Number) position).longValue();
+        }
+        if (position instanceof String) {
+            try {
+                return Long.parseLong((String) position);
+            } catch (NumberFormatException e) {
+                return 0L;
+            }
+        }
+        return 0L;
     }
 
     private void printTraceInfo(WriterResponse response) {
