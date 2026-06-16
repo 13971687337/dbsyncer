@@ -135,6 +135,7 @@ public final class IncrementPuller extends AbstractPuller implements Application
     public void close(String metaId) {
         map.compute(metaId, (k, listener) -> {
             if (listener != null) {
+                listener.forceFlushEvent();
                 listener.close();
             }
             bufferActuatorRouter.unbind(metaId);

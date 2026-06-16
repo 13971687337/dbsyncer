@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @version 1.0.0
@@ -31,6 +32,10 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final int FLUSH_DELAYED_SECONDS = 20;
+    private final AtomicLong eventCounter = new AtomicLong(0);
+    private volatile long lastFlushTime = System.currentTimeMillis();
+    private static final long FLUSH_INTERVAL_MS = 1000;
+    private static final long FLUSH_BATCH_SIZE = 1000;
     protected String database;
     protected String schema;
     protected ConnectorInstance connectorInstance;
@@ -79,6 +84,7 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
                 default:
                     break;
             }
+            eventCounter.incrementAndGet();
         }
     }
 
@@ -89,11 +95,16 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
 
     @Override
     public void flushEvent() {
-        // 20s内更新，执行写入
-        if (watcher.getMetaUpdateTime() > Timestamp.valueOf(LocalDateTime.now().minusSeconds(FLUSH_DELAYED_SECONDS)).getTime()) {
+        long now = System.currentTimeMillis();
+        if (eventCounter.get() >= FLUSH_BATCH_SIZE
+                || (now - lastFlushTime >= FLUSH_INTERVAL_MS
+                    && watcher.getMetaUpdateTime() > Timestamp.valueOf(
+                        LocalDateTime.now().minusSeconds(FLUSH_DELAYED_SECONDS)).getTime())) {
             if (!CollectionUtils.isEmpty(snapshot)) {
                 logger.info("snapshot：{}", snapshot);
                 watcher.flushEvent(snapshot);
+                eventCounter.set(0);
+                lastFlushTime = now;
             }
         }
     }
@@ -128,6 +139,7 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
     private void processEvent(boolean permitEvent, ChangedEvent event) {
         if (permitEvent) {
             watcher.changeEvent(event);
+            eventCounter.incrementAndGet();
         }
     }
 
