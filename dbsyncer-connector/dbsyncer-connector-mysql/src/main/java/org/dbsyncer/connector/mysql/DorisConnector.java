@@ -132,9 +132,13 @@ public final class DorisConnector extends AbstractDatabaseConnector implements C
 
     @Override
     public String buildJdbcUrl(DatabaseConfig config, String database) {
+        // jdbc:mysql://host:port/db?rewriteBatchedStatements=true
+        // rewriteBatchedStatements=true: MySQL JDBC驱动将批量INSERT改写为多行VALUES语法，
+        // 单次网络往返写入多行数据，大幅提升Doris写入吞吐
         StringBuilder url = new StringBuilder();
         url.append("jdbc:mysql://").append(config.getHost()).append(":").append(config.getPort());
         if (database != null && !database.trim().isEmpty()) url.append("/").append(database);
+        url.append("?rewriteBatchedStatements=true");
         return url.toString();
     }
 

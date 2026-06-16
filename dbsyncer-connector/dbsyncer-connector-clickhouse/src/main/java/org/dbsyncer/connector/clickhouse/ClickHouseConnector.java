@@ -280,12 +280,15 @@ public final class ClickHouseConnector extends AbstractDatabaseConnector {
 
     @Override
     public String buildJdbcUrl(DatabaseConfig config, String database) {
-        // jdbc:clickhouse://host:port/db
+        // jdbc:clickhouse://host:port/db?async_insert=1&wait_for_async_insert=1
+        // async_insert=1: 启用ClickHouse服务端异步插入，攒批后合并写入，大幅提升OLAP写入吞吐
+        // wait_for_async_insert=1: 等待异步插入完成，保证客户端感知写入结果
         StringBuilder url = new StringBuilder();
         url.append("jdbc:clickhouse://").append(config.getHost()).append(":").append(config.getPort());
         if (StringUtil.isNotBlank(database)) {
             url.append("/").append(database);
         }
+        url.append("?async_insert=1&wait_for_async_insert=1");
         return url.toString();
     }
 }
