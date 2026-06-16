@@ -73,4 +73,20 @@ public class TableGroupBufferConfig extends BufferActuatorConfig {
         setBufferPeriodMillisecond(300);
         setBufferWriterCount(100);
     }
+
+    /**
+     * 深拷贝配置对象，使每个执行器拥有独立的配置副本，
+     * 避免共享Spring单例Bean导致所有执行器互相干扰。
+     */
+    public TableGroupBufferConfig copy() {
+        TableGroupBufferConfig c = new TableGroupBufferConfig();
+        c.setBufferPullCount(this.getBufferPullCount());
+        c.setBufferQueueCapacity(this.getBufferQueueCapacity());
+        c.setBufferPeriodMillisecond(this.getBufferPeriodMillisecond());
+        c.setBufferWriterCount(this.getBufferWriterCount());
+        c.setThreadCoreSize(this.getThreadCoreSize());
+        c.setMaxThreadSize(this.getMaxThreadSize());
+        c.setThreadQueueCapacity(this.getThreadQueueCapacity());
+        return c;
+    }
 }

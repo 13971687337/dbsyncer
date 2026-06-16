@@ -266,6 +266,10 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
         this.config = config;
     }
 
+    public BufferActuatorConfig getConfig() {
+        return config;
+    }
+
     public void reconfig(BufferActuatorConfig newConfig) {
         this.config = newConfig;
     }

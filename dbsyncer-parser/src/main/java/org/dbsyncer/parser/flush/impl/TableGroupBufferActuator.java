@@ -87,4 +87,12 @@ public class TableGroupBufferActuator extends GeneralBufferActuator implements T
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
+
+    /**
+     * 注入独立的配置副本，供路由根据表热度差异化配置。
+     * 必须在 {@link #buildConfig()} 之前调用。
+     */
+    public void setTableGroupBufferConfig(TableGroupBufferConfig config) {
+        this.tableGroupBufferConfig = config;
+    }
 }
