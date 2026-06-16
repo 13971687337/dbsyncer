@@ -244,11 +244,11 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
                 try {
                     Response response = responseClazz.newInstance();
                     partition(poll, response);
-                    Map<String, Response> barrierMap = new ConcurrentHashMap<>();
-                    barrierMap.put(key, response);
-                    process(barrierMap);
+                    // 直接执行DDL，不嵌套process()避免递归创建VirtualThread executor
+                    pull(response);
+                    logger.info("[{}{}]{}, {}ms", key, response.getSuffixName(), response.getTaskSize(), 0L);
                 } catch (Exception e) {
-                    throw new ParserException(e);
+                    logger.error(e.getMessage(), e);
                 }
                 batchCounter.incrementAndGet();
                 continue;

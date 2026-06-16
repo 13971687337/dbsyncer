@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * WAL写入器
@@ -42,7 +42,7 @@ public class WalWriter implements Closeable {
     private final File walFile;
     private final BufferedWriter writer;
     private final AtomicLong sequence = new AtomicLong(0);
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public WalWriter(String walDir, String metaId) throws IOException {
         Files.createDirectories(Paths.get(walDir));
@@ -73,14 +73,14 @@ public class WalWriter implements Closeable {
         entry.setBinlogPosition(binlogPosition);
         entry.setCommitted(false);
 
-        lock.writeLock().lock();
+        lock.lock();
         try {
             String json = JsonUtil.objToJson(entry);
             writer.write(json);
             writer.newLine();
             writer.flush(); // 确保持久化到磁盘
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
         return entry;
     }
@@ -91,7 +91,7 @@ public class WalWriter implements Closeable {
      * @param seq 要标记为已提交的序号
      */
     public void commit(long seq) {
-        lock.writeLock().lock();
+        lock.lock();
         try {
             // 写入提交标记行，JSON格式 {"commit":<seq>}
             writer.write("{\"commit\":" + seq + "}");
@@ -100,7 +100,7 @@ public class WalWriter implements Closeable {
         } catch (IOException e) {
             logger.error("写入WAL提交标记失败, seq={}", seq, e);
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 
@@ -113,12 +113,12 @@ public class WalWriter implements Closeable {
 
     @Override
     public void close() throws IOException {
-        lock.writeLock().lock();
+        lock.lock();
         try {
             writer.close();
             logger.info("WAL文件已关闭: {}", walFile.getAbsolutePath());
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 }
