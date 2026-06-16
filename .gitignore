@@ -25,3 +25,4 @@ log.txt
 .claude/settings.json
 .claude/.edit-count*
 ui_bak/
+.gstack/

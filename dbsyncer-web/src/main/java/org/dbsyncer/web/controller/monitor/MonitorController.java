@@ -230,7 +230,7 @@ public class MonitorController extends BaseController {
 
     @GetMapping("/metrics/throughput/{metaId}")
     @ResponseBody
-    public List<Map<String, Object>> getThroughputTrend(@PathVariable String metaId) {
+    public List<Map<String, Object>> getThroughputTrend(@PathVariable("metaId") String metaId) {
         return monitorService.getThroughputTrend(metaId);
     }
 
