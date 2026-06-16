@@ -46,6 +46,11 @@ public final class BufferActuatorRouter implements DisposableBean {
     private GeneralBufferActuator generalBufferActuator;
 
     /**
+     * 串行模式Actuator key前缀
+     */
+    private static final String SERIAL_KEY_PREFIX = "serial-";
+
+    /**
      * 驱动缓存执行路由列表
      */
     private final Map<String, Map<String, TableGroupBufferActuator>> router = new ConcurrentHashMap<>();
@@ -58,6 +63,14 @@ public final class BufferActuatorRouter implements DisposableBean {
             if (processor == null) {
                 offer(generalBufferActuator, event);
                 return null;
+            }
+
+            // 串行模式：优先使用共享Actuator
+            String serialKey = SERIAL_KEY_PREFIX + metaId;
+            TableGroupBufferActuator serialActuator = processor.get(serialKey);
+            if (serialActuator != null) {
+                offer(serialActuator, event);
+                return processor;
             }
 
             processor.compute(event.getSourceTableName(), (x, actuator) -> {
@@ -81,21 +94,33 @@ public final class BufferActuatorRouter implements DisposableBean {
                     logger.warn("Not allowed more than table processor limited size:{}", profileComponent.getSystemConfig().getMaxBufferActuatorSize());
                     break;
                 }
-                final String tableName = tableGroup.getSourceTable().getName();
-                processor.computeIfAbsent(tableName, name -> {
-                    TableGroupBufferActuator newBufferActuator = null;
-                    try {
-                        newBufferActuator = (TableGroupBufferActuator) tableGroupBufferActuatorService.clone();
-                        newBufferActuator.setTableName(name);
-                        newBufferActuator.buildConfig();
-                    } catch (CloneNotSupportedException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
-                    return newBufferActuator;
-                });
+                if (tableGroup.isSerialMode()) {
+                    // 串行模式：同mapping下所有表共享一个Actuator
+                    String serialKey = SERIAL_KEY_PREFIX + metaId;
+                    processor.computeIfAbsent(serialKey, this::createActuator);
+                } else {
+                    // 每表独立Actuator（默认行为）
+                    final String tableName = tableGroup.getSourceTable().getName();
+                    processor.computeIfAbsent(tableName, this::createActuator);
+                }
             }
             return processor;
         });
+    }
+
+    /**
+     * 创建缓存执行器
+     */
+    private TableGroupBufferActuator createActuator(String name) {
+        TableGroupBufferActuator newBufferActuator = null;
+        try {
+            newBufferActuator = (TableGroupBufferActuator) tableGroupBufferActuatorService.clone();
+            newBufferActuator.setTableName(name);
+            newBufferActuator.buildConfig();
+        } catch (CloneNotSupportedException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return newBufferActuator;
     }
 
     public void unbind(String metaId) {

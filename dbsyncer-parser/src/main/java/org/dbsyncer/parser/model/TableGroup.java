@@ -26,6 +26,9 @@ public class TableGroup extends AbstractConfigModel {
     // 排序索引
     private int index;
 
+    // 是否使用串行模式（同mapping下所有表共享一个Actuator保证写入顺序）
+    private boolean serialMode;
+
     // 驱动映射关系ID
     private String mappingId;
 
@@ -47,6 +50,14 @@ public class TableGroup extends AbstractConfigModel {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public boolean isSerialMode() {
+        return serialMode;
+    }
+
+    public void setSerialMode(boolean serialMode) {
+        this.serialMode = serialMode;
     }
 
     public String getMappingId() {
