@@ -3,6 +3,7 @@
  */
 package org.dbsyncer.manager.impl;
 
+import org.dbsyncer.biz.impl.MetricReporter;
 import org.dbsyncer.common.scheduled.ScheduledTaskJob;
 import org.dbsyncer.common.scheduled.ScheduledTaskService;
 import org.dbsyncer.connector.base.ConnectorFactory;
@@ -56,8 +57,8 @@ import java.util.stream.Collectors;
  * 增量同步
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2020-04-26 15:28
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public final class IncrementPuller extends AbstractPuller implements ApplicationListener<RefreshOffsetEvent>, ScheduledTaskJob {
@@ -81,6 +82,9 @@ public final class IncrementPuller extends AbstractPuller implements Application
 
     @Resource
     private LogService logService;
+
+    @Resource
+    private MetricReporter metricReporter;
 
     @Resource
     private TableGroupContext tableGroupContext;
@@ -164,7 +168,7 @@ public final class IncrementPuller extends AbstractPuller implements Application
         if (null == listener) {
             throw new ManagerException(String.format("Unsupported listener type \"%s\".", connectorConfig.getConnectorType()));
         }
-        listener.register(new ParserConsumer(bufferActuatorRouter, profileComponent, pluginFactory, logService, meta.getId(), list));
+        listener.register(new ParserConsumer(bufferActuatorRouter, profileComponent, pluginFactory, logService, metricReporter::recordEvent, meta.getId(), list));
 
         // 默认定时抽取
         if (ListenerTypeEnum.isTiming(listenerType) && listener instanceof AbstractQuartzListener) {

@@ -14,9 +14,9 @@ import org.dbsyncer.parser.sql.SqlParser;
 import java.util.List;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-10 00:44
+ * @Date 2026-06-02 14:25
  */
 public final class InsertSql implements SqlParser {
 

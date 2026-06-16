@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
  * 支持: binary
  * ES 中 binary 类型以 Base64 编码存储
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 22:21
+ * @Date 2026-06-02 14:25
  */
 public final class ElasticsearchBytesType extends BytesType {
 

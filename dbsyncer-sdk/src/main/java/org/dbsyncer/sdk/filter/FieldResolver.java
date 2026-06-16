@@ -4,9 +4,9 @@
 package org.dbsyncer.sdk.filter;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-11 17:36
+ * @Date 2026-06-02 14:25
  */
 @FunctionalInterface
 public interface FieldResolver<F> {

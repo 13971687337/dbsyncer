@@ -7,9 +7,9 @@ import net.sf.jsqlparser.parser.CCJSqlParserTokenManager;
 import net.sf.jsqlparser.parser.SimpleCharStream;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-03-02 16:07
+ * @Date 2026-06-02 14:25
  */
 public class SimpleSqlParserTokenManager extends CCJSqlParserTokenManager {
 

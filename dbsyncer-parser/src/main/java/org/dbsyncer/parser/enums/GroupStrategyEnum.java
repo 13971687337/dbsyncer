@@ -9,7 +9,7 @@ import org.dbsyncer.parser.strategy.impl.PreloadTableGroupStrategy;
 import org.dbsyncer.parser.strategy.impl.TableGroupStrategy;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/24 14:19
  */

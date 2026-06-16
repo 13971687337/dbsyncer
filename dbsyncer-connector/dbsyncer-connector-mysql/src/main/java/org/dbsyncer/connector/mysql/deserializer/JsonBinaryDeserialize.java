@@ -9,9 +9,9 @@ import com.github.shyiko.mysql.binlog.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-08-30 00:22
+ * @Date 2026-06-02 14:25
  */
 public final class JsonBinaryDeserialize {
 

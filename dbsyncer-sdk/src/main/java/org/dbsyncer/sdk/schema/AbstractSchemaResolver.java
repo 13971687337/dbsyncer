@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-26 20:50
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractSchemaResolver implements SchemaResolver {
 

@@ -3,7 +3,7 @@ package org.dbsyncer.common.config;
 /**
  * 缓冲区配置
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/7/14 23:50
  */

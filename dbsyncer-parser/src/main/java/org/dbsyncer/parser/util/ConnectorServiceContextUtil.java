@@ -7,9 +7,9 @@ import org.dbsyncer.parser.model.Mapping;
 import org.dbsyncer.sdk.connector.DefaultConnectorServiceContext;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-05 22:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class ConnectorServiceContextUtil {
 

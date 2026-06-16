@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 /**
  * Kafka监听器，支持批量拉取多个topic数据
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-10 14:58
+ * @Date 2026-06-02 14:25
  */
 public class KafkaListener extends AbstractListener<KafkaConnectorInstance> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

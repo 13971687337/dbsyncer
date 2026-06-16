@@ -4,9 +4,9 @@
 package org.dbsyncer.connector.sqlite;
 
 /**
- * @Author bble
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-28 16:22
+ * @Date 2026-06-02 14:25
  */
 public class SQLiteException extends RuntimeException {
 

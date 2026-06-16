@@ -8,9 +8,9 @@ import org.dbsyncer.sdk.model.ChangedOffset;
 /**
  * 监听器接口，提供实现增量同步功能，支持定时和日志解析
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-21 22:48
+ * @Date 2026-06-02 14:25
  */
 public interface Listener {
 

@@ -6,7 +6,7 @@ import java.util.Properties;
 
 /**
  * 连接器配置
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/21 0:01
  */

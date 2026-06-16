@@ -5,7 +5,7 @@ import org.dbsyncer.parser.convert.AbstractHandler;
 /**
  * Number转String
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/7/20 23:04
  */

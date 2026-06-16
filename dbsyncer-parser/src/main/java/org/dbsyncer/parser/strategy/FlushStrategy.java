@@ -5,7 +5,7 @@ import org.dbsyncer.common.model.Result;
 /**
  * 记录同步数据策略
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/29 22:38
  */

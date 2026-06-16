@@ -27,7 +27,7 @@ import java.util.Properties;
 /**
  * 邮件通知服务实现
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/11/13 22:20
  */

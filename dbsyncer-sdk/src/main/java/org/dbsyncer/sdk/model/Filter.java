@@ -8,7 +8,7 @@ import org.dbsyncer.sdk.enums.OperationEnum;
 
 /**
  * 字段属性条件
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/30 15:10
  */

@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * 支持的条件和运算符类型
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-19 16:02
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class ConditionServiceImpl implements ConditionService {

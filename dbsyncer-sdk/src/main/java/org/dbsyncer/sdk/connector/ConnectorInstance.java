@@ -10,7 +10,7 @@ import org.dbsyncer.sdk.model.ConnectorConfig;
  *
  * @param <K> 配置
  * @param <V> 实例
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/3/20 23:00
  */

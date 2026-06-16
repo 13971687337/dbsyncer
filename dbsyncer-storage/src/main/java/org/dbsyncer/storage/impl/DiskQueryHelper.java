@@ -13,9 +13,9 @@ import org.dbsyncer.sdk.filter.AbstractFilter;
 import org.dbsyncer.storage.StorageException;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-11 22:27
+ * @Date 2026-06-02 14:25
  */
 public class DiskQueryHelper {
 

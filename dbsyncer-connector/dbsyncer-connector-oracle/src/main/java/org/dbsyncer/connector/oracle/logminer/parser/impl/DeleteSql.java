@@ -10,9 +10,9 @@ import org.dbsyncer.sdk.model.Field;
 import java.util.List;
 
 /**
- * @Author life
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-14 14:58
+ * @Date 2026-06-02 14:25
  */
 public class DeleteSql extends AbstractParser {
 

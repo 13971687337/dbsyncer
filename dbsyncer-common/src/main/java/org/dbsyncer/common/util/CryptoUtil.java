@@ -23,7 +23,7 @@ import java.util.Map;
  * 支持AES-GCM加密和RSA密钥交换
  * 支持公网/内网场景的签名算法
  * 
- * @author AE86
+ * @author zhangxl
  * @version 2.0.0
  */
 public class CryptoUtil {

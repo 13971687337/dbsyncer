@@ -3,7 +3,7 @@ package org.dbsyncer.parser.enums;
 /**
  * 解析器参数枚举
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/29 10:19
  */

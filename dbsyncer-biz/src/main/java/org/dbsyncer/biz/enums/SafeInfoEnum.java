@@ -3,7 +3,7 @@ package org.dbsyncer.biz.enums;
 /**
  * 安全信息枚举
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/8/26 23:21
  */

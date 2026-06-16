@@ -15,8 +15,8 @@ import java.util.List;
  * 变更事件
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2023-08-20 20:00
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface ChangedEvent extends Cloneable {
 

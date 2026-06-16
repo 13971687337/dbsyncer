@@ -17,7 +17,7 @@ import org.dbsyncer.sdk.enums.DDLOperationEnum;
  * DROP COLUMN `bbb`
  * </code>
  *
- * @author life
+ * @author zhangxl
  */
 public class DropStrategy implements AlterStrategy {
 

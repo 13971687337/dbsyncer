@@ -4,9 +4,9 @@
 package org.dbsyncer.storage;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-10 21:38
+ * @Date 2026-06-02 14:25
  */
 public class StorageException extends RuntimeException {
 

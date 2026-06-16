@@ -5,8 +5,8 @@ package org.dbsyncer.sdk;
 
 /**
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-16 00:51
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public class SdkException extends RuntimeException {
 

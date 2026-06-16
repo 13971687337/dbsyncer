@@ -30,9 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-03-02 15:05
+ * @Date 2026-06-02 14:25
  */
 public abstract class SqlParserUtil {
 

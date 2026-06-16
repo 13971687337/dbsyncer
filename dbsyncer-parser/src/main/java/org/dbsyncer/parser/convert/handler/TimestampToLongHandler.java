@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 /**
  * Timestamp转Long
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2021/9/2 23:04
  */

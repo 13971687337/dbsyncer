@@ -3,7 +3,7 @@ package org.dbsyncer.parser.model;
 import org.dbsyncer.sdk.constant.ConfigConstant;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/11/16 23:16
  */

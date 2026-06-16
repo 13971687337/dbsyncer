@@ -14,9 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-21 23:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class StringType extends AbstractDataType<String> {
 

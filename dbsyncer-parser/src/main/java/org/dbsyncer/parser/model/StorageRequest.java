@@ -5,7 +5,7 @@ import org.dbsyncer.parser.flush.BufferRequest;
 import java.util.Map;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/3/27 16:57
  */

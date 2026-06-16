@@ -7,8 +7,8 @@ package org.dbsyncer.sdk.enums;
  * 支持同步的DDL命令
  *
  * @version 1.0.0
- * @Author life
- * @Date 2023-09-24 14:24
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public enum DDLOperationEnum {
     /**

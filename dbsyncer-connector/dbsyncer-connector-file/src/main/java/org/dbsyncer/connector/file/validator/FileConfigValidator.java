@@ -18,9 +18,9 @@ import java.util.Map;
 /**
  * 文件连接配置校验器实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-06 00:04
+ * @Date 2026-06-02 14:25
  */
 public class FileConfigValidator implements ConfigValidator<FileConnector, FileConfig> {
 

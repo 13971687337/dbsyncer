@@ -13,8 +13,8 @@ import java.util.Map;
  * 配置序列化
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-12 01:32
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class PersistenceCommand implements Command {
 

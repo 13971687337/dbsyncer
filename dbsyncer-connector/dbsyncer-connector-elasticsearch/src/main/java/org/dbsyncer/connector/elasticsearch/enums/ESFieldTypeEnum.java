@@ -11,9 +11,9 @@ import java.sql.Types;
 /**
  * ES字段类型
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
- * @Date 2023-08-26 21:13
+ * @Date 2026-06-02 14:25
  */
 public enum ESFieldTypeEnum {
 

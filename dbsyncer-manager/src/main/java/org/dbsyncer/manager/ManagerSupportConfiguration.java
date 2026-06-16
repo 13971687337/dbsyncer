@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
- * @Date 2023-11-19 23:29
+ * @Date 2026-06-02 14:25
  */
 @Configuration
 public class ManagerSupportConfiguration {

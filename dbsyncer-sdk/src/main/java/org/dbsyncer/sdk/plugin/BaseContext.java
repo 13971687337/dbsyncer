@@ -8,9 +8,9 @@ import org.dbsyncer.sdk.connector.ConnectorInstance;
 import java.util.Map;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-12-05 00:59
+ * @Date 2026-06-02 14:25
  */
 public interface BaseContext {
 

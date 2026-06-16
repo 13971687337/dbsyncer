@@ -3,7 +3,7 @@ package org.dbsyncer.sdk.config;
 import org.dbsyncer.sdk.enums.ListenerTypeEnum;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/10/8 22:36
  */

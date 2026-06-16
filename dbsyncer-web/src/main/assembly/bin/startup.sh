@@ -51,4 +51,4 @@ SERVER_OPTS="$SERVER_OPTS \
 echo $SERVER_OPTS
 java $SERVER_OPTS -cp "$DBS_HOME/lib/*" $APP > /dev/null & echo $! > $DBS_HOME/tmp.pid
 echo 'Start successfully!'
-exit 1
+exit 0

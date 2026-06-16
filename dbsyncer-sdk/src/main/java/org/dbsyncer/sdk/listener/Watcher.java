@@ -6,8 +6,8 @@ import java.util.Map;
  * 数据变更监听器
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2020-05-11 22:50
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface Watcher {
 

@@ -3,7 +3,7 @@ package org.dbsyncer.parser;
 import java.util.Map;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/30 22:38
  */

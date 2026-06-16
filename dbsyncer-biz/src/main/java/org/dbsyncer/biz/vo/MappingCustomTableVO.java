@@ -12,9 +12,9 @@ import java.util.List;
 /**
  * 驱动自定义表信息
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-04 21:41
+ * @Date 2026-06-02 14:25
  */
 public class MappingCustomTableVO {
 

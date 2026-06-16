@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -33,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>1. 任务优先进入缓存队列
  * <p>2. 将任务分区合并，批量执行
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/3/27 17:36
  */
@@ -136,15 +138,18 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
      * @param map
      */
     protected void process(Map<String, Response> map) {
-        map.forEach((key, response) -> {
-            long now = Instant.now().toEpochMilli();
-            try {
-                pull(response);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-            logger.info("[{}{}]{}, {}ms", key, response.getSuffixName(), response.getTaskSize(), (Instant.now().toEpochMilli() - now));
-        });
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            map.forEach((key, response) -> executor.submit(() -> {
+                long now = Instant.now().toEpochMilli();
+                try {
+                    pull(response);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+                logger.info("[{}{}]{}, {}ms", key, response.getSuffixName(), response.getTaskSize(),
+                        (Instant.now().toEpochMilli() - now));
+            }));
+        }
     }
 
     /**

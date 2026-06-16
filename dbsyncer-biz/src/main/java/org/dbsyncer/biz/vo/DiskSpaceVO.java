@@ -6,9 +6,9 @@ package org.dbsyncer.biz.vo;
 import java.math.BigDecimal;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-20 20:50
+ * @Date 2026-06-02 14:25
  */
 public final class DiskSpaceVO {
     private BigDecimal used;

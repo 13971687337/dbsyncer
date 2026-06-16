@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 22:21
+ * @Date 2026-06-02 14:25
  */
 public final class KafkaDoubleType extends DoubleType {
 

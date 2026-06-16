@@ -5,7 +5,7 @@ import org.dbsyncer.sdk.enums.ChangedEventTypeEnum;
 import org.dbsyncer.sdk.model.ChangedOffset;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/4/4 23:02
  */

@@ -8,11 +8,11 @@ if [ ! -f ${CONFIG_PATH} ]; then
   exit 1
 fi
 
-# kill thread
+# kill by pid file
 PID=$APP_DIR/tmp.pid
 if [ -f ${PID} ]; then
-  pkill -f $PID
-  rm -f $PID
+  kill $(cat ${PID}) 2>/dev/null
+  rm -f ${PID}
 fi
 sleep 0.3
 
@@ -26,7 +26,7 @@ if [[ -n ${PROCESS} ]]; then
     kill ${p}
   done
   echo 'Stop successfully!';
-  exit 1;
+  exit 0;
 fi
 
 echo 'The app already stopped.';

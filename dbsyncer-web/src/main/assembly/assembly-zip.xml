@@ -17,11 +17,6 @@
             <fileMode>0644</fileMode>
         </fileSet>
 
-        <!-- 插件 -->
-        <fileSet>
-            <directory>src/main/assembly/plugins</directory>
-            <outputDirectory>plugins</outputDirectory>
-        </fileSet>
 
         <!-- 执行脚本 -->
         <fileSet>

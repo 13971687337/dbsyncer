@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-12-25 00:03
+ * @Date 2026-06-02 14:25
  */
 public final class OracleLongType extends LongType {
 

@@ -7,8 +7,8 @@ package org.dbsyncer.common.model;
  * RSA配置
  *
  * @version 1.0.0
- * @Author 穿云
- * @Date 2026-01-15 08:30
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public class RSAConfig {
 

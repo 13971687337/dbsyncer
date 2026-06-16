@@ -9,9 +9,9 @@ import org.dbsyncer.sdk.model.Field;
 import java.lang.reflect.ParameterizedType;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-24 20:58
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractDataType<T> implements DataType {
 

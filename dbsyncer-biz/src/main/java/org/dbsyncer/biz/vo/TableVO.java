@@ -9,9 +9,9 @@ import org.dbsyncer.sdk.model.Table;
 /**
  * 表信息
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-08 21:41
+ * @Date 2026-06-02 14:25
  */
 public final class TableVO extends Table {
 

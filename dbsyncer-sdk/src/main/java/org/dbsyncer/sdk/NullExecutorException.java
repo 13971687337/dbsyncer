@@ -4,9 +4,9 @@
 package org.dbsyncer.sdk;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-10-13 21:38
+ * @Date 2026-06-02 14:25
  */
 public class NullExecutorException extends RuntimeException {
 

@@ -4,9 +4,9 @@
 package org.dbsyncer.parser.sql;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-10 00:43
+ * @Date 2026-06-02 14:25
  */
 public interface SqlParser {
 

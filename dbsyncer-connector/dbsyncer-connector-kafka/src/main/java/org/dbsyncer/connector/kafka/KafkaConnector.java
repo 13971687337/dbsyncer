@@ -40,9 +40,9 @@ import java.util.Map;
 /**
  * Kafka连接器实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-11-22 23:55
+ * @Date 2026-06-02 14:25
  */
 public class KafkaConnector extends AbstractConnector implements ConnectorService<KafkaConnectorInstance, KafkaConfig> {
 

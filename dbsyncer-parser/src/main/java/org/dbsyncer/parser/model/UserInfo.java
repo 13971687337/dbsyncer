@@ -1,7 +1,7 @@
 package org.dbsyncer.parser.model;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/11/17 23:09
  */

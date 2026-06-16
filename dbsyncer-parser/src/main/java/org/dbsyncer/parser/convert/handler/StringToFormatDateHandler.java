@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * 字符串转日期自定义格式
  *
- * @author wuji
+ * @author zhangxl
  */
 public class StringToFormatDateHandler extends AbstractHandler {
 

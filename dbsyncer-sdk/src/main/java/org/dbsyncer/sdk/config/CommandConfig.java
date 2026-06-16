@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 查询同步参数模板
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/16 23:59
  */

@@ -11,7 +11,7 @@ import org.dbsyncer.sdk.listener.filter.YesDateFilter;
 import org.dbsyncer.sdk.listener.filter.YesTimestampFilter;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/05/30 14:19
  */

@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * 合并分组指标
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-04-15 23:13
+ * @Date 2026-06-02 14:25
  */
 public interface MetricGroupProcessor {
     List<MetricResponseVo> process(List<MetricResponseVo> metrics);

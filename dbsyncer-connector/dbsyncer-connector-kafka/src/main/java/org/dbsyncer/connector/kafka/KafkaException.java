@@ -4,9 +4,9 @@
 package org.dbsyncer.connector.kafka;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 20:17
+ * @Date 2026-06-02 14:25
  */
 public class KafkaException extends RuntimeException {
 

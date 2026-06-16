@@ -13,7 +13,7 @@ import org.dbsyncer.sdk.connector.database.sqlbuilder.SqlBuilderQueryCount;
 import org.dbsyncer.sdk.connector.database.sqlbuilder.SqlBuilderUpdate;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/28 22:13
  */

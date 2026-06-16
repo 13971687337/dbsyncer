@@ -16,13 +16,13 @@ if exist %ENCRYPT_FILE% (
 set SERVER_OPTS=%SERVER_OPTS% -agentpath:%ENCRYPT_FILE%
 )
 
-set SERVER_OPTS=%SERVER_OPTS% -Djava.ext.dirs="%JAVA_HOME%\jre\lib\ext;%DBS_HOME%lib"
+
 set SERVER_OPTS=%SERVER_OPTS% -Dspring.config.location=%DBS_HOME%conf\application.properties
 set SERVER_OPTS=%SERVER_OPTS% -DLOG_PATH=%DBS_HOME%\logs
 set SERVER_OPTS=%SERVER_OPTS% -Dsun.stdout.encoding=UTF-8 -Dfile.encoding=UTF-8 -Duser.dir=%DBS_HOME%
-set SERVER_OPTS=%SERVER_OPTS% -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -XX:+CMSClassUnloadingEnabled -XX:+DisableExplicitGC
-set SERVER_OPTS=%SERVER_OPTS% -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=68 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps
+set SERVER_OPTS=%SERVER_OPTS% -XX:ParallelGCThreads=4 -XX:+DisableExplicitGC
+set SERVER_OPTS=%SERVER_OPTS% -Xlog:gc*:file=%DBS_HOME%logs\gc_%p.log:time,level,tags
 set SERVER_OPTS=%SERVER_OPTS% -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%DBS_HOME%logs -XX:ErrorFile=%DBS_HOME%logs\hs_err.log
 
 echo %SERVER_OPTS%
-java %SERVER_OPTS% org.dbsyncer.web.Application
+java %SERVER_OPTS% org.dbsyncer.web.DBSyncerStartup

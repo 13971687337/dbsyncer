@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
  * ES 字符串类型
  * 支持: keyword, text, string(deprecated), ip, object, geo_point, geo_shape
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 22:21
+ * @Date 2026-06-02 14:25
  */
 public final class ElasticsearchStringType extends StringType {
 

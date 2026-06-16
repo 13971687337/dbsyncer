@@ -7,9 +7,9 @@ import org.dbsyncer.sdk.enums.StorageEnum;
 import org.dbsyncer.sdk.storage.Strategy;
 
 /**
- * @Author wuji
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-10-18 20:36
+ * @Date 2026-06-02 14:25
  */
 public final class TaskStrategy implements Strategy {
     @Override

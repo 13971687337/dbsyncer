@@ -9,7 +9,7 @@ import java.util.Properties;
 /**
  * 表基本信息
  *
- * @author AE86
+ * @author zhangxl
  * @ClassName: MetaInfo
  * @Description: 包括字段信息、总条数
  * @date: 2017年7月20日 下午3:37:59

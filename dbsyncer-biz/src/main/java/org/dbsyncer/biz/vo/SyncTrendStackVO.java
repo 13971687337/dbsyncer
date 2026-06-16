@@ -9,9 +9,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * 同步趋势数据
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-20 02:33
+ * @Date 2026-06-02 14:25
  */
 public class SyncTrendStackVO {
 

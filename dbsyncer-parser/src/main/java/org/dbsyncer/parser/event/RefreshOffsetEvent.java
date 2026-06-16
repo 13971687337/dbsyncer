@@ -10,8 +10,8 @@ import java.util.List;
  * 刷新偏移量事件
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2023-08-23 22:45
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class RefreshOffsetEvent extends ApplicationContextEvent {
 

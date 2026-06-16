@@ -8,7 +8,7 @@ import org.dbsyncer.parser.convert.handler.*;
 /**
  * 支持的转换类型
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/19 23:56
  */

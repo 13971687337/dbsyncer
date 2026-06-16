@@ -9,9 +9,9 @@ import java.util.List;
 /**
  * 产品信息
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-05-19 10:35
+ * @Date 2026-06-02 14:25
  */
 public class ProductInfo {
 

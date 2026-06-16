@@ -23,8 +23,8 @@ import java.util.stream.Stream;
  * 关系型数据库定时抽取
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2021-09-01 20:35
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class DatabaseQuartzListener extends AbstractQuartzListener {
 

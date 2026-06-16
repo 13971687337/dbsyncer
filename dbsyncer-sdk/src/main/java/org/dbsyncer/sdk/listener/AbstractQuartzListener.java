@@ -31,8 +31,8 @@ import java.util.stream.Stream;
  * 定时抽取
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2020-05-12 20:35
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractQuartzListener extends AbstractListener implements ScheduledTaskJob {
 

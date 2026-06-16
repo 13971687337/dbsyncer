@@ -18,7 +18,7 @@ package org.dbsyncer.storage.enums;
  * boolean  8Byte    64-bit
  * </pre>
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/4/21 22:07
  */

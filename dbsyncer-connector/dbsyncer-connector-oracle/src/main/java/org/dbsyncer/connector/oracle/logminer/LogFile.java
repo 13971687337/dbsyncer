@@ -7,9 +7,9 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-09 20:20
+ * @Date 2026-06-02 14:25
  */
 public class LogFile {
     private final String fileName;

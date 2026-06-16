@@ -6,7 +6,7 @@ import org.dbsyncer.parser.convert.AbstractHandler;
 /**
  * 去掉首字符
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/10/8 23:05
  */

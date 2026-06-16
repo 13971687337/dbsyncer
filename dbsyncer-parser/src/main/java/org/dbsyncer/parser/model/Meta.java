@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *     增量同步:定时>时间戳; 日志>binlogFileName/binlogPosition/主从节点信息等
  * </pre>
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/21 16:19
  */

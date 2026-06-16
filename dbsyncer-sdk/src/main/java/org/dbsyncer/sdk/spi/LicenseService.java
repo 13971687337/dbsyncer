@@ -6,9 +6,9 @@ package org.dbsyncer.sdk.spi;
 import org.dbsyncer.sdk.model.ProductInfo;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-05-13 01:17
+ * @Date 2026-06-02 14:25
  */
 public interface LicenseService {
 

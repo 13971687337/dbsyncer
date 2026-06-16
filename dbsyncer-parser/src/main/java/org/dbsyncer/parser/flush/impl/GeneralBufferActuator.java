@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
  * 通用执行器（单线程消费，多线程批量写，按序执行）
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2022-03-27 16:50
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class GeneralBufferActuator extends AbstractBufferActuator<WriterRequest, WriterResponse> {

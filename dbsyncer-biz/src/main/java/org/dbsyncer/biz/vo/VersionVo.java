@@ -2,8 +2,8 @@ package org.dbsyncer.biz.vo;
 
 /**
  * @version 1.0.0
- * @Author AE86
- * @Date 2021-01-27 20:55
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public class VersionVo {
 

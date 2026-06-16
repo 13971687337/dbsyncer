@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -41,14 +39,7 @@ public abstract class BatchTaskUtil {
      * @return
      */
     public static ExecutorService createExecutor(int threadPoolSize, int maximumPoolSize, int queueSize) {
-        return new ThreadPoolExecutor(
-                threadPoolSize,                     // 核心线程数
-                maximumPoolSize,                    // 最大线程数
-                60L,                                // 线程空闲时间
-                TimeUnit.SECONDS,                   // 过期时间单位
-                new ArrayBlockingQueue<>(queueSize), // 有界队列
-                Executors.defaultThreadFactory(),   // 线程工厂
-                new ThreadPoolExecutor.CallerRunsPolicy());  // 拒绝策略, 当队列满时，由调用线程执行任务
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 
     /**

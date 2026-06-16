@@ -11,7 +11,7 @@ import org.dbsyncer.sdk.constant.ConfigConstant;
 /**
  * 枚举命令模式: 持久化和预加载
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/24 14:19
  */

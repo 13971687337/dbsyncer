@@ -19,9 +19,9 @@ import java.util.Objects;
 /**
  * ES连接配置校验器实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-08-25 23:30
+ * @Date 2026-06-02 14:25
  */
 public final class ESConfigValidator implements ConfigValidator<ElasticsearchConnector, ESConfig> {
 

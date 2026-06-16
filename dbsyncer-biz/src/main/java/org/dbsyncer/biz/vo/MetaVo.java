@@ -3,7 +3,7 @@ package org.dbsyncer.biz.vo;
 import org.dbsyncer.parser.model.Meta;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/01/03 17:20
  */

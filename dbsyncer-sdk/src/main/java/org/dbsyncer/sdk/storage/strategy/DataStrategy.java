@@ -10,9 +10,9 @@ import org.springframework.util.Assert;
 /**
  * 数据：全量或增量数据
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-16 23:22
+ * @Date 2026-06-02 14:25
  */
 public final class DataStrategy implements Strategy {
 

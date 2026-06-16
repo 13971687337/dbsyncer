@@ -16,9 +16,9 @@ import java.util.Objects;
 /**
  * 运算符表达式类型
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-09-26 23:21
+ * @Date 2026-06-02 14:25
  */
 public enum FilterEnum {
 

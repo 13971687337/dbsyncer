@@ -6,7 +6,7 @@ package org.dbsyncer.sdk.config;
 import org.dbsyncer.sdk.model.ConnectorConfig;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @ClassName: DatabaseConfig
  * @Description: 数据库连接配置
  * @date: 2017年7月20日 下午3:40:59

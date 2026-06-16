@@ -14,9 +14,9 @@ import java.util.Properties;
 /**
  * 存储服务（支持记录配置/日志/同步数据）
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-16 23:22
+ * @Date 2026-06-02 14:25
  */
 public interface StorageService {
 

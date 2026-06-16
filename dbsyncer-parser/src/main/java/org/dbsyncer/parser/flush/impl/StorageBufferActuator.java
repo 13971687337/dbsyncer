@@ -25,8 +25,8 @@ import java.util.concurrent.Executor;
  * 持久化执行器
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-03-27 16:50
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public final class StorageBufferActuator extends AbstractBufferActuator<StorageRequest, StorageResponse> {

@@ -7,7 +7,7 @@ import org.dbsyncer.sdk.config.SqlBuilderConfig;
 import org.dbsyncer.sdk.connector.database.Database;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/8/8 0:03
  */

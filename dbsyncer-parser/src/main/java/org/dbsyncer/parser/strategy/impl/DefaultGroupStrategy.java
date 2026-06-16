@@ -7,7 +7,7 @@ import org.dbsyncer.parser.model.ConfigModel;
 import org.dbsyncer.parser.strategy.GroupStrategy;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/12/2 22:53
  */

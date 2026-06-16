@@ -9,9 +9,9 @@ import org.dbsyncer.sdk.model.Filter;
 /**
  * 过滤语法实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-17 23:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractFilter extends Filter {
 

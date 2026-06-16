@@ -1,7 +1,7 @@
 package org.dbsyncer.connector.base;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/9/28 22:39
  */

@@ -6,9 +6,9 @@ package org.dbsyncer.biz.model;
 import org.dbsyncer.biz.vo.SyncTrendStackVO;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-16 23:59
+ * @Date 2026-06-02 14:25
  */
 public final class DashboardMetric extends MappingReportMetric {
 

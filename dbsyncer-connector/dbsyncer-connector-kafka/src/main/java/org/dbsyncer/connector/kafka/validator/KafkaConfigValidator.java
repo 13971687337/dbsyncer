@@ -21,9 +21,9 @@ import java.util.Properties;
 /**
  * Kafka连接配置校验器实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-11-22 23:55
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class KafkaConfigValidator implements ConfigValidator<KafkaConnector, KafkaConfig> {

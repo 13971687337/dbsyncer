@@ -7,8 +7,8 @@ package org.dbsyncer.sdk.spi;
  * 部署服务接口
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-19 23:24
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface DeploymentService {
 }

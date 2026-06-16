@@ -17,7 +17,7 @@ import org.dbsyncer.sdk.enums.DDLOperationEnum;
  * ADD COLUMN `bbb` varchar(255) NULL AFTER `aaa`
  * </code>
  *
- * @author life
+ * @author zhangxl
  */
 public class AddStrategy implements AlterStrategy {
 

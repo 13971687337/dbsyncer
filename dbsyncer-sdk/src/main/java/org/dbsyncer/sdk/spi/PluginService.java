@@ -9,7 +9,7 @@ import org.dbsyncer.sdk.plugin.PluginContext;
  * 插件扩展服务接口
  * <p>全量同步/增量同步,扩展转换</p>
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2021/02/22 20:26
  */

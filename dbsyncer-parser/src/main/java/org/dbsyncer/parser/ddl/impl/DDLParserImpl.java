@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * ddl解析器, 支持类型参考：{@link DDLOperationEnum}
  *
- * @author life
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/9/19 22:38
  */

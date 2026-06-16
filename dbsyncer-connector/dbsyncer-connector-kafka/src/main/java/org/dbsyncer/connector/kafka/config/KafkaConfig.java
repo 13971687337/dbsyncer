@@ -9,9 +9,9 @@ import org.dbsyncer.sdk.model.ConnectorConfig;
 /**
  * Kafka连接配置
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-11-04 20:10
+ * @Date 2026-06-02 14:25
  */
 public class KafkaConfig extends ConnectorConfig {
 

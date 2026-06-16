@@ -25,8 +25,8 @@ import java.util.List;
  * {@link ConfigConstant}
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-13 20:48
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface ProfileComponent {
 

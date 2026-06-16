@@ -6,9 +6,9 @@ package org.dbsyncer.common.enums;
 /**
  * 任务调度类型枚举
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-06-13 00:00
+ * @Date 2026-06-02 14:25
  */
 public enum DispatchTaskEnum {
 

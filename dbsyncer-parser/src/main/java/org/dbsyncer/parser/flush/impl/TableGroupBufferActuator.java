@@ -19,8 +19,8 @@ import java.util.concurrent.Executor;
  * 表执行器（根据表消费数据，多线程批量写，按序执行）
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-03-27 16:50
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public class TableGroupBufferActuator extends GeneralBufferActuator implements TableGroupBufferActuatorService {
 

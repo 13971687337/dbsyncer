@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-13 00:08
+ * @Date 2026-06-02 14:25
  */
 public final class SQLiteSchemaResolver extends AbstractSchemaResolver {
     @Override

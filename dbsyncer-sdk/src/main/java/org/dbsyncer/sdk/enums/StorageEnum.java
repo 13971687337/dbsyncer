@@ -4,9 +4,9 @@
 package org.dbsyncer.sdk.enums;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-12 20:29
+ * @Date 2026-06-02 14:25
  */
 public enum StorageEnum {
 

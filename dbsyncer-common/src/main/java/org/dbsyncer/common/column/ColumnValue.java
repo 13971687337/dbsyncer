@@ -9,9 +9,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-04-22 22:39
+ * @Date 2026-06-02 14:25
  */
 public interface ColumnValue {
 

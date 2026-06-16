@@ -24,9 +24,9 @@ import jakarta.annotation.Resource;
 import java.util.Map;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-08 15:17
+ *   2020-01-08 15:17
  */
 @Component
 public class ConnectorChecker extends AbstractChecker {

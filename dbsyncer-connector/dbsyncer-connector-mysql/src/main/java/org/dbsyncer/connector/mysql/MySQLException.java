@@ -4,9 +4,9 @@
 package org.dbsyncer.connector.mysql;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-11-22 23:55
+ * @Date 2026-06-02 14:25
  */
 public class MySQLException extends RuntimeException {
 

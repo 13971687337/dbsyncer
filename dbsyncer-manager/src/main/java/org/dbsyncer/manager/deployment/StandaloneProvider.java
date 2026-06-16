@@ -9,8 +9,8 @@ import org.dbsyncer.sdk.spi.DeploymentService;
  * 单机部署
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-19 23:29
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class StandaloneProvider implements DeploymentService {
 }

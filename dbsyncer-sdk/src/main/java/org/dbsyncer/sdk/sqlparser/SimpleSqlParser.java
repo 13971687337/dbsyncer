@@ -271,9 +271,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-03-02 15:18
+ * @Date 2026-06-02 14:25
  */
 public class SimpleSqlParser extends AbstractJSqlParser<SimpleSqlParser> implements CCJSqlParserTreeConstants, CCJSqlParserConstants {
     public JJTCCJSqlParserState jjtree = new JJTCCJSqlParserState();

@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  * ES 双精度浮点类型
  * 支持: double
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 22:21
+ * @Date 2026-06-02 14:25
  */
 public final class ElasticsearchDoubleType extends DoubleType {
 

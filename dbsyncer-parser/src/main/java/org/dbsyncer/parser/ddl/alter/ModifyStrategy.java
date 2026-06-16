@@ -17,7 +17,7 @@ import org.dbsyncer.sdk.enums.DDLOperationEnum;
  * MODIFY COLUMN `remark` varchar(204) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL AFTER `name`
  * </code>
  *
- * @author life
+ * @author zhangxl
  */
 public class ModifyStrategy implements AlterStrategy {
 

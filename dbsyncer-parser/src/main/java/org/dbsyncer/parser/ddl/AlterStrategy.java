@@ -10,8 +10,8 @@ import org.dbsyncer.sdk.config.DDLConfig;
  * Alter策略
  *
  * @version 1.0.0
- * @Author life
- * @Date 2023-09-24 14:24
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface AlterStrategy {
 

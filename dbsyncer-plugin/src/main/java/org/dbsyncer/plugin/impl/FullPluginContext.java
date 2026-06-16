@@ -4,7 +4,7 @@ import org.dbsyncer.sdk.enums.ModelEnum;
 import org.dbsyncer.sdk.plugin.AbstractPluginContext;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0s
  * @date 2022/6/30 16:04
  */

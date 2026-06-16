@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 表执行器配置
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/8/28 23:50
  */

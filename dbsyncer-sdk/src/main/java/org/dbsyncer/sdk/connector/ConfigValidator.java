@@ -12,9 +12,9 @@ import java.util.Map;
 /**
  * 连接器配置校验器
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-07 23:17
+ * @Date 2026-06-02 14:25
  */
 public interface ConfigValidator<S extends ConnectorService, C extends ConnectorConfig> {
 

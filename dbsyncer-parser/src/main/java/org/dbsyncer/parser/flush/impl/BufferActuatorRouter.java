@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * 缓存执行器路由
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-12 01:32
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public final class BufferActuatorRouter implements DisposableBean {

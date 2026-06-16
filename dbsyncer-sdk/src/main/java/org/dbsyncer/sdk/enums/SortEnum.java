@@ -6,7 +6,7 @@ package org.dbsyncer.sdk.enums;
 /**
  * 支持的排序方式
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/6/1 00:07
  */

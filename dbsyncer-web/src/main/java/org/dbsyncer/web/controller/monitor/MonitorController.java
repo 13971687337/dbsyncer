@@ -7,6 +7,7 @@ import org.dbsyncer.biz.BizException;
 import org.dbsyncer.biz.ConnectorService;
 import org.dbsyncer.biz.DataSyncService;
 import org.dbsyncer.biz.MonitorService;
+import org.dbsyncer.biz.impl.MetricReporter;
 import org.dbsyncer.biz.enums.MetricEnum;
 import org.dbsyncer.biz.model.AppReportMetric;
 import org.dbsyncer.biz.model.MetricResponse;
@@ -46,6 +47,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +70,9 @@ public class MonitorController extends BaseController {
 
     @Resource
     private MonitorService monitorService;
+
+    @Resource
+    private MetricReporter metricReporter;
 
     @Resource
     private DataSyncService dataSyncService;
@@ -227,6 +232,18 @@ public class MonitorController extends BaseController {
     @ResponseBody
     public List<Map<String, Object>> getThroughputTrend(@PathVariable String metaId) {
         return monitorService.getThroughputTrend(metaId);
+    }
+
+    @GetMapping("/api/metrics")
+    @ResponseBody
+    public Map<String, Object> getAllMetrics() {
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("health", monitorService.getHealthOverview());
+        metrics.put("tableQueues", monitorService.getTableQueueDepths());
+        metrics.put("heapUsedMb", metricReporter.getHeapUsedMb());
+        metrics.put("actuatorCount", metricReporter.getActuatorCountActive());
+        metrics.put("listenerStatus", metricReporter.getListenerStatusMap());
+        return metrics;
     }
 
     private void collectCpu() {

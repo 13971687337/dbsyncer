@@ -4,9 +4,9 @@
 package org.dbsyncer.connector.sqlserver;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-08 15:17
+ * @Date 2026-06-02 14:25
  */
 public class SqlServerException extends RuntimeException {
 

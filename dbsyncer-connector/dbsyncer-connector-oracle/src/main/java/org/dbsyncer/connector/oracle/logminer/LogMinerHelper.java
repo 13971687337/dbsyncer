@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-09 20:23
+ * @Date 2026-06-02 14:25
  */
 public class LogMinerHelper {
     private static final Logger logger = LoggerFactory.getLogger(LogMinerHelper.class);

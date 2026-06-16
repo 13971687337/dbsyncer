@@ -4,9 +4,9 @@
 package org.dbsyncer.sdk.client;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-14 23:34
+ * @Date 2026-06-02 14:25
  */
 public interface RemoteClient {
 }

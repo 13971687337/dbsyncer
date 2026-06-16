@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  * ES 浮点类型
  * 支持: float, half_float
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2026-01-11 22:21
+ * @Date 2026-06-02 14:25
  */
 public final class ElasticsearchFloatType extends FloatType {
 

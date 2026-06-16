@@ -61,4 +61,4 @@ SERVER_OPTS="$SERVER_OPTS \
 
 # execute command
 echo $SERVER_OPTS
-java $SERVER_OPTS -Dfile.encoding=UTF-8 -cp "$DBS_HOME/lib/*" $APP
+exec java $SERVER_OPTS -cp "$DBS_HOME/lib/*" $APP

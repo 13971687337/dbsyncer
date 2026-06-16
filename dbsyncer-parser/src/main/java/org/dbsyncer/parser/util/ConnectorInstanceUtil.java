@@ -4,9 +4,9 @@
 package org.dbsyncer.parser.util;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-01 22:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class ConnectorInstanceUtil {
 

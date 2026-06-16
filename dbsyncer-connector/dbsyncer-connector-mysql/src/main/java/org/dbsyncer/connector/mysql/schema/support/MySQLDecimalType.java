@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-26 22:59
+ * @Date 2026-06-02 14:25
  */
 public final class MySQLDecimalType extends DecimalType {
 

@@ -31,9 +31,9 @@ import java.util.Map;
  *
  * @param <I> ConnectorInstance
  * @param <C> ConnectorConfig
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-19 23:24
+ * @Date 2026-06-02 14:25
  */
 public interface ConnectorService<I extends ConnectorInstance, C extends ConnectorConfig> {
 

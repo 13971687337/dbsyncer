@@ -6,8 +6,8 @@ import org.dbsyncer.sdk.enums.ChangedEventTypeEnum;
  * DDL变更事件
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2023-09-18 23:00
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class DDLChangedEvent extends CommonChangedEvent {
     private final String sql;

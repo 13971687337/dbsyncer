@@ -28,9 +28,9 @@ import java.util.Objects;
 /**
  * Oracle 字段值解析
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-01-09 23:02
+ * @Date 2026-06-02 14:25
  */
 public class OracleColumnValue extends AbstractColumnValue<Expression> {
 

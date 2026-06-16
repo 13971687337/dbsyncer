@@ -10,9 +10,9 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-07 22:27
+ * @Date 2026-06-02 14:25
  */
 public class BufferedRandomAccessFile extends RandomAccessFile {
     static final int LogBuffSz_ = 16; // 64K buffer

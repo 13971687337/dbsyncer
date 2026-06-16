@@ -38,8 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 全量同步
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2020-04-26 15:28
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public final class FullPuller extends AbstractPuller implements ApplicationListener<FullRefreshEvent> {
@@ -63,7 +63,7 @@ public final class FullPuller extends AbstractPuller implements ApplicationListe
         Assert.notEmpty(list, "映射关系不能为空");
         Thread worker = new Thread(() -> {
             final String metaId = mapping.getMetaId();
-            ExecutorService executor = Executors.newFixedThreadPool(mapping.getThreadNum());
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             try {
                 Task task = map.computeIfAbsent(metaId, k -> new Task(metaId));
                 logger.info("开始全量同步：{}, {}", metaId, mapping.getName());

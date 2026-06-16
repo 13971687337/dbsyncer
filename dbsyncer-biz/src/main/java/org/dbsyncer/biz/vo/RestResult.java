@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 请求响应对象
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2017年3月30日 下午2:26:19
  */

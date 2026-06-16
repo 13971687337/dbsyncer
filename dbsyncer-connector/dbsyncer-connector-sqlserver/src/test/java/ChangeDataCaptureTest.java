@@ -17,9 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-22 22:56
+ * @Date 2026-06-02 14:25
  * @Link https://www.red-gate.com/simple-talk/sql/learn-sql-server/introduction-to-change-data-capture-cdc-in-sql-server-2008/
  */
 public class ChangeDataCaptureTest {

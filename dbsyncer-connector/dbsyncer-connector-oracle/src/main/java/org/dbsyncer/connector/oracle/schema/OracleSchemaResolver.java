@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-12-24 23:45
+ * @Date 2026-06-02 14:25
  */
 public final class OracleSchemaResolver extends AbstractSchemaResolver {
     @Override

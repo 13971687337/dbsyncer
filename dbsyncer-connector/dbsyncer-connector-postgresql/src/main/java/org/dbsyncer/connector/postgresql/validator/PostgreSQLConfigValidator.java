@@ -12,9 +12,9 @@ import org.dbsyncer.sdk.connector.database.AbstractDatabaseConnector;
 import java.util.Map;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-04-05 22:14
+ * @Date 2026-06-02 14:25
  */
 public class PostgreSQLConfigValidator extends AbstractDataBaseConfigValidator {
 

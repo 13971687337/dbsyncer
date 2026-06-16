@@ -10,9 +10,9 @@ import org.dbsyncer.sdk.storage.strategy.*;
 /**
  * 存储策略枚举
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-12 00:51
+ * @Date 2026-06-02 14:25
  */
 public enum StorageStrategyEnum {
 

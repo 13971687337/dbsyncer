@@ -7,8 +7,8 @@ import org.springframework.context.event.ApplicationContextEvent;
  * 任务关闭事件
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2020-04-26 22:45
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class ClosedEvent extends ApplicationContextEvent {
 

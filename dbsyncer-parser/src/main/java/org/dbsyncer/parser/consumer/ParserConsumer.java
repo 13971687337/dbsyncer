@@ -17,24 +17,27 @@ import org.dbsyncer.sdk.listener.Watcher;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-12 01:32
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class ParserConsumer implements Watcher {
     private final BufferActuatorRouter bufferActuatorRouter;
     private final ProfileComponent profileComponent;
     private final PluginFactory pluginFactory;
     private final LogService logService;
+    private final BiConsumer<String, String> eventRecorder;
     private final String metaId;
 
-    public ParserConsumer(BufferActuatorRouter bufferActuatorRouter, ProfileComponent profileComponent, PluginFactory pluginFactory, LogService logService, String metaId, List<TableGroup> tableGroups) {
+    public ParserConsumer(BufferActuatorRouter bufferActuatorRouter, ProfileComponent profileComponent, PluginFactory pluginFactory, LogService logService, BiConsumer<String, String> eventRecorder, String metaId, List<TableGroup> tableGroups) {
         this.bufferActuatorRouter = bufferActuatorRouter;
         this.profileComponent = profileComponent;
         this.pluginFactory = pluginFactory;
         this.logService = logService;
+        this.eventRecorder = eventRecorder;
         this.metaId = metaId;
         // 注册到路由服务中
         bufferActuatorRouter.bind(metaId, tableGroups);
@@ -47,6 +50,9 @@ public final class ParserConsumer implements Watcher {
 
     @Override
     public void changeEvent(ChangedEvent event) {
+        if (eventRecorder != null) {
+            eventRecorder.accept(metaId, event.getEvent());
+        }
         bufferActuatorRouter.execute(metaId, event);
     }
 

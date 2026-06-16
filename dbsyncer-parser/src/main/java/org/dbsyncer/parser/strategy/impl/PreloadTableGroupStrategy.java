@@ -8,7 +8,7 @@ import org.dbsyncer.parser.strategy.GroupStrategy;
 import org.dbsyncer.sdk.constant.ConfigConstant;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2019/12/2 22:53
  */

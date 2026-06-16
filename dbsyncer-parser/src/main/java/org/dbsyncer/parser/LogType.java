@@ -3,7 +3,7 @@ package org.dbsyncer.parser;
 /**
  * 日志类型枚举
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/21 16:19
  */

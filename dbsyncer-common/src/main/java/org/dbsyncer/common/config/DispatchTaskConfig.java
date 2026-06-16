@@ -12,9 +12,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 /**
  * 调度任务执行器配置
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-06-22 23:20
+ * @Date 2026-06-02 14:25
  */
 @Configuration
 @ConfigurationProperties(prefix = "dbsyncer.common.dispatch")

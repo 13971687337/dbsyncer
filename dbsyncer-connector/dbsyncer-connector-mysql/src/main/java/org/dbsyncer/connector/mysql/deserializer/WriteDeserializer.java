@@ -12,9 +12,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-04-12 15:21
+ * @Date 2026-06-02 14:25
  */
 public final class WriteDeserializer extends WriteRowsEventDataDeserializer {
 

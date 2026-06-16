@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.Resource;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-05-12 01:08
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class AppConfigServiceImpl implements AppConfigService {

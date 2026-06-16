@@ -4,7 +4,7 @@ import org.dbsyncer.parser.model.Connector;
 import org.dbsyncer.parser.model.Mapping;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/01/03 17:20
  */

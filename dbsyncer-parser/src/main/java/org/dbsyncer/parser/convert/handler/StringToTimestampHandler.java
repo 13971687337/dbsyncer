@@ -6,7 +6,7 @@ import org.dbsyncer.parser.convert.AbstractHandler;
 /**
  * 字符串转Timestamp
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/7/12 23:04
  */

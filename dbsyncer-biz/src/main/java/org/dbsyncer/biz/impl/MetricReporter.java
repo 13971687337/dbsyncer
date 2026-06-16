@@ -103,6 +103,13 @@ public class MetricReporter implements ScheduledTaskJob {
     private final Map<String, AtomicLong> lastEventTimes = new ConcurrentHashMap<>();
     private final Map<String, Long> writeLatencies = new ConcurrentHashMap<>();
 
+    // 补充指标: binlog延迟、listener状态
+    private final Map<String, AtomicLong> binlogLagMap = new ConcurrentHashMap<>();
+    private final Map<String, String> listenerStatusMap = new ConcurrentHashMap<>();
+
+    // 吞吐量历史快照
+    private final Map<String, List<Long>> throughputHistory = new ConcurrentHashMap<>();
+
     @PostConstruct
     private void init() {
         scheduledTaskService.start(5000, this);
@@ -182,12 +189,38 @@ public class MetricReporter implements ScheduledTaskJob {
 
     public void recordWrite(String metaId, String tableName, int rows, long latencyMs) {
         writeRowsPerSecWindows.computeIfAbsent(metaId, k -> new SlidingWindow(60)).add(rows);
+        lastEventTimes.computeIfAbsent(metaId, k -> new AtomicLong()).set(System.currentTimeMillis());
         lastEventTimes.put(tableName, new AtomicLong(System.currentTimeMillis()));
         writeLatencies.merge(tableName, latencyMs, (old, v) -> (old + v) / 2);
     }
 
     public void recordError(String metaId) {
         writeErrorCounters.computeIfAbsent(metaId, k -> new AtomicLong()).incrementAndGet();
+    }
+
+    public void recordBinlogLag(String metaId, long lagBytes) {
+        binlogLagMap.computeIfAbsent(metaId, k -> new AtomicLong()).set(lagBytes);
+    }
+
+    public long getBinlogLag(String metaId) {
+        AtomicLong v = binlogLagMap.get(metaId);
+        return v != null ? v.get() : 0;
+    }
+
+    public long getHeapUsedMb() {
+        return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
+    }
+
+    public int getActuatorCountActive() {
+        return bufferActuatorRouter != null ? bufferActuatorRouter.getRouter().size() : 0;
+    }
+
+    public void updateListenerStatus(String metaId, String status) {
+        listenerStatusMap.put(metaId, status);
+    }
+
+    public Map<String, String> getListenerStatusMap() {
+        return new HashMap<>(listenerStatusMap);
     }
 
     public long getLastEventTime(String metaId) {
@@ -206,11 +239,26 @@ public class MetricReporter implements ScheduledTaskJob {
     }
 
     public List<Map<String, Object>> getThroughputHistory(String metaId) {
-        return new ArrayList<>();
+        List<Long> snapshots = throughputHistory.get(metaId);
+        if (snapshots == null) {
+            return new ArrayList<>();
+        }
+        List<Map<String, Object>> result = new ArrayList<>(snapshots.size());
+        long now = System.currentTimeMillis();
+        for (int i = 0; i < snapshots.size(); i++) {
+            Map<String, Object> point = new HashMap<>();
+            point.put("time", now - (snapshots.size() - 1 - i) * 5000L);
+            point.put("value", snapshots.get(i));
+            result.add(point);
+        }
+        return result;
     }
 
     @Override
     public void run() {
+        // 采集吞吐量快照（每次调度都执行，不受查询时间限制）
+        snapshotThroughput();
+
         if (running || null == queryTime) {
             return;
         }
@@ -264,6 +312,23 @@ public class MetricReporter implements ScheduledTaskJob {
         } finally {
             running = false;
         }
+    }
+
+    /**
+     * 采集所有活跃驱动的吞吐量快照，保留最近60个采样点
+     */
+    private void snapshotThroughput() {
+        eventsPerSecWindows.forEach((metaId, window) -> {
+            long sum = window.sum();
+            List<Long> snapshots = throughputHistory.computeIfAbsent(metaId, k -> new ArrayList<>());
+            synchronized (snapshots) {
+                snapshots.add(sum);
+                // 保留最近60个采样点（5分钟窗口）
+                while (snapshots.size() > 60) {
+                    snapshots.remove(0);
+                }
+            }
+        });
     }
 
     private void updateSyncTrendData(List<Meta> metaAll, DashboardMetric dashboardMetric) {

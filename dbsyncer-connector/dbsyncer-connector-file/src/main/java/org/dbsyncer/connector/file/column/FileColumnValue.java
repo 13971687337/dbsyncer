@@ -16,9 +16,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-05 23:19
+ * @Date 2026-06-02 14:25
  */
 public class FileColumnValue extends AbstractColumnValue<String> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

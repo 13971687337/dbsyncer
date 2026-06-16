@@ -4,9 +4,9 @@
 package org.dbsyncer.plugin.enums;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-08-13 00:27
+ * @Date 2026-06-02 14:25
  */
 public enum ProcessEnum {
 

@@ -15,8 +15,8 @@ import org.dbsyncer.parser.model.UserConfig;
  * 预加载接口
  *
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-12 01:32
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public interface Preload {
 

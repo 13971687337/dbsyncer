@@ -7,9 +7,9 @@ import java.util.Properties;
 import java.util.Map;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-28 23:21
+ * @Date 2026-06-02 14:25
  */
 public abstract class PropertiesUtil {
 

@@ -8,9 +8,9 @@ import org.dbsyncer.sdk.SdkException;
 /**
  * 标准数据类型
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-23 22:39
+ * @Date 2026-06-02 14:25
  */
 public enum DataTypeEnum {
     /** 文本 */

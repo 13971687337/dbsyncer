@@ -25,9 +25,9 @@ import java.util.Set;
 /**
  * CDC-ES定时监听器
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-09-01 20:35
+ * @Date 2026-06-02 14:25
  */
 public final class ESQuartzListener extends AbstractQuartzListener {
 

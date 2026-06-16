@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-12-09 20:26
+ * @Date 2026-06-02 14:25
  */
 public class TransactionalBuffer {
     private final Logger logger = LoggerFactory.getLogger(getClass());

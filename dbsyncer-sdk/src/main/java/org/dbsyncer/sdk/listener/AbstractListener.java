@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @version 1.0.0
- * @Author AE86
- * @Date 2020-05-25 22:35
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractListener<C extends ConnectorInstance> implements Listener {
 

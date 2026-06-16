@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 
 /**
  * SQLite连接器实现
- * @Author bble
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-28 16:22
+ * @Date 2026-06-02 14:25
  */
 public final class SQLiteConnector extends AbstractDatabaseConnector {
 

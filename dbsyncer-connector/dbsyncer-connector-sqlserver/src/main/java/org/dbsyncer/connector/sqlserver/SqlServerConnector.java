@@ -37,9 +37,9 @@ import java.util.Map;
 /**
  * SqlServer连接器实现
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-22 22:56
+ * @Date 2026-06-02 14:25
  */
 public final class SqlServerConnector extends AbstractDatabaseConnector {
     private final String QUERY_DATABASE = "SELECT name FROM SYS.DATABASES WHERE database_id > 4 order by name";

@@ -34,9 +34,9 @@ import java.util.concurrent.TimeoutException;
 /**
  * Kafka连接器实例
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-11-22 23:55
+ * @Date 2026-06-02 14:25
  */
 public final class KafkaConnectorInstance implements ConnectorInstance<KafkaConfig, AdminClient> {
     private KafkaConfig config;

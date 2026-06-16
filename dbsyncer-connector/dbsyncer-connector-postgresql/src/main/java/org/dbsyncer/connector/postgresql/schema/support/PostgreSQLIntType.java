@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-06-25 23:26
+ * @Date 2026-06-02 14:25
  */
 public final class PostgreSQLIntType extends IntType {
     private enum TypeEnum {

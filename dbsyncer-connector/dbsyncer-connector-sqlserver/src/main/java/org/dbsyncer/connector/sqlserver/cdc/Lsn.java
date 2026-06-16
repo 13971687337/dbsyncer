@@ -10,9 +10,9 @@ import org.dbsyncer.common.util.StringUtil;
 /**
  * SQL Server LSN（日志序列号）位置的逻辑表示, LSN不可用时为NULL。
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2022-05-22 22:56
+ * @Date 2026-06-02 14:25
  */
 public class Lsn implements Comparable<Lsn> {
     private static final String NULL_STRING = "NULL";

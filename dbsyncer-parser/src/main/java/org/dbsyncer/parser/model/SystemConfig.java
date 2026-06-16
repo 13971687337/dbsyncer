@@ -13,8 +13,8 @@ import org.dbsyncer.sdk.constant.ConfigConstant;
  * 系统配置
  *
  * @version 1.0.0
- * @Author AE86
- * @Date 2020-05-29 20:13
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public class SystemConfig extends ConfigModel {
 

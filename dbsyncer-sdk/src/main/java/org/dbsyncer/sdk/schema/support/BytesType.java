@@ -11,9 +11,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-21 23:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class BytesType extends AbstractDataType<byte[]> {
 

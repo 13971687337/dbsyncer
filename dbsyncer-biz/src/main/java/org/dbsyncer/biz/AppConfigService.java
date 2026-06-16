@@ -6,9 +6,9 @@ package org.dbsyncer.biz;
 import org.dbsyncer.biz.vo.VersionVo;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-05-12 01:08
+ * @Date 2026-06-02 14:25
  */
 public interface AppConfigService {
 

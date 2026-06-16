@@ -46,9 +46,9 @@ import java.util.Map;
 /**
  * ES测试用例
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-25 23:10
+ * @Date 2026-06-02 14:25
  */
 public class ESClientTest {
     private final Logger logger = LoggerFactory.getLogger(getClass());

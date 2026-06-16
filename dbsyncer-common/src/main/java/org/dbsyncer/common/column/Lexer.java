@@ -1,7 +1,7 @@
 package org.dbsyncer.common.column;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/4/24 18:22
  */

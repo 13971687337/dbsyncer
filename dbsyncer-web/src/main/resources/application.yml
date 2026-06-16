@@ -1,0 +1,134 @@
+# 服务IP
+server:
+  ip: 127.0.0.1
+  # 访问端口
+  port: 19686
+
+  # ============================================================
+  # HTTPS 配置（默认关闭，生产环境请替换为自己的证书）
+  # 生成证书: keytool -genkeypair -alias dbsyncer -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore conf/dbsyncer.p12 -validity 3650
+  # 开启: server.ssl.enabled=true + server.ssl.key-store=conf/dbsyncer.p12 + server.ssl.key-store-password=your_password
+  # ============================================================
+  ssl:
+    enabled: false
+
+  servlet:
+    # 会话过期时间(秒)
+    session:
+      timeout: 1800
+    # 访问服务的路径，‘/’ -> http://${server.ip}:${server.port}/
+    context-path: /
+
+spring:
+  profiles:
+    active: default
+
+# All < Trace < Debug < Info < Warn < Error < Fatal < OFF
+logging:
+  level:
+    root: info
+
+dbsyncer:
+  # web
+  web:
+    # 机器的唯一编号（单机部署则填默认值; 部署集群时, 要保证编号在集群中唯一）
+    worker:
+      id: 1
+    scheduler:
+      # 定时任务线程数
+      pool-size: 8
+    security:
+      # 重置admin默认密码（false-禁用; true-重置, 高危操作, 恢复后一定要改回false）
+      reset-pwd: false
+
+  # common
+  common:
+    dispatch:
+      # 调度线程数
+      thread-core-size: 8
+      # 调度最大线程数
+      max-thread-size: 16
+      # 调度线程池队列
+      thread-queue-capacity: 64
+
+  # parser
+  parser:
+    # 表执行器上限（默认50→200，支持更多表独立并行）
+    max-buffer-actuator-size: 200
+
+    # *********************** 通用执行器配置 ***********************
+    general:
+      # [GeneralBufferActuator]线程数
+      thread-core-size: 8
+      # [GeneralBufferActuator]最大线程数
+      max-thread-size: 16
+      # [GeneralBufferActuator]线程池队列
+      thread-queue-capacity: 64
+      # [GeneralBufferActuator]单次执行任务数
+      buffer-writer-count: 1000
+      # [GeneralBufferActuator]每次消费缓存队列的任务数
+      buffer-pull-count: 20000
+      # [GeneralBufferActuator]缓存队列容量（Phase 2 优化：50000→100000）
+      buffer-queue-capacity: 100000
+      # [GeneralBufferActuator]定时消费缓存队列间隔(毫秒)
+      buffer-period-millisecond: 300
+
+    # *********************** 表执行器配置 ***********************
+    table:
+      group:
+        # [TableGroupBufferActuator]线程数
+        thread-core-size: 1
+        # [TableGroupBufferActuator]最大线程数
+        max-thread-size: 1
+        # [TableGroupBufferActuator]线程池队列
+        thread-queue-capacity: 16
+        # [TableGroupBufferActuator]单次执行任务数
+        buffer-writer-count: 1000
+        # [TableGroupBufferActuator]每次消费缓存队列的任务数
+        buffer-pull-count: 1000
+        # [TableGroupBufferActuator]缓存队列容量
+        buffer-queue-capacity: 10000
+        # [TableGroupBufferActuator]定时消费缓存队列间隔(毫秒)
+        buffer-period-millisecond: 300
+
+  # storage
+  storage:
+    # 数据存储类型:disk(默认)/mysql(推荐生产环境使用)
+    # disk-磁盘:/data/config(驱动配置)|data(按驱动分别存储增量数据)|log(系统日志)
+    type: disk
+    mysql:
+      url: "jdbc:mysql://127.0.0.1:3306/dbsyncer?rewriteBatchedStatements=true&seUnicode=true&characterEncoding=UTF8&serverTimezone=Asia/Shanghai&useSSL=false&verifyServerCertificate=false&autoReconnect=true&tinyInt1isBit=false&allowPublicKeyRetrieval=true"
+      username: root
+      password: root
+
+    # 存储优化：仅保留失败数据，减少 Lucene 写入量 80%+
+    enable-storage-write-success: false
+    enable-storage-write-full: false
+
+    # [StorageBufferActuator]线程数
+    thread-core-size: 4
+    # [StorageBufferActuator]最大线程数
+    max-thread-size: 8
+    # [StorageBufferActuator]线程池队列
+    thread-queue-capacity: 64
+    # [StorageBufferActuator]单次执行任务数
+    buffer-writer-count: 1000
+    # [StorageBufferActuator]每次消费缓存队列的任务数
+    buffer-pull-count: 20000
+    # [StorageBufferActuator]缓存队列容量
+    buffer-queue-capacity: 50000
+    # [StorageBufferActuator]定时消费缓存队列间隔(毫秒)
+    buffer-period-millisecond: 300
+
+  # plugin
+  plugin:
+    notify:
+      mail:
+        # 是否开启邮箱通知功能（false-关闭; true-开启）
+        # 进入Web管理页面：配置 >> 用户管理，给用户配置邮箱即可接受通知消息
+        # 默认间隔10分钟触发一次通知消息，满足发通知条件：1、驱动有失败数据 2、手动停止驱动
+        enabled: false
+        # 发邮箱的账号，示例：836391306@qq.com
+        username: your mail username
+        # 发邮件的Code（注：不是邮箱密码），示例：wqoxxxxxxdflbbig
+        password: your mail authorization code

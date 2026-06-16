@@ -5,7 +5,7 @@ import org.dbsyncer.sdk.model.Field;
 /**
  * 字段映射关系
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/01/16 15:20
  */

@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 
 /**
  * @Version 1.0.0
- * @Author AE86
- * @Date 2023-11-13 21:16
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class ProfileComponentImpl implements ProfileComponent {

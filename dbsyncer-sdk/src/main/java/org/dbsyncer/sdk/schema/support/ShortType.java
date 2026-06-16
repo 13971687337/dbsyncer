@@ -8,9 +8,9 @@ import org.dbsyncer.sdk.model.Field;
 import org.dbsyncer.sdk.schema.AbstractDataType;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-21 23:56
+ * @Date 2026-06-02 14:25
  */
 public abstract class ShortType extends AbstractDataType<Short> {
 

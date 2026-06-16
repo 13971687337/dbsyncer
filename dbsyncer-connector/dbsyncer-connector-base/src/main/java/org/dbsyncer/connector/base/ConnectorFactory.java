@@ -39,9 +39,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 连接器工厂
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-09-18 23:30
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class ConnectorFactory implements DisposableBean {

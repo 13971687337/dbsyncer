@@ -10,9 +10,9 @@ import org.dbsyncer.sdk.enums.OperationEnum;
 import java.util.List;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-19 17:20
+ * @Date 2026-06-02 14:25
  */
 public class ConditionVo {
 

@@ -9,9 +9,9 @@ import org.dbsyncer.sdk.storage.Strategy;
 /**
  * 配置：Connector、Mapping、TableGroup、Meta、ProjectGroup、SystemConfig、UserConfig
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2019-11-16 23:22
+ * @Date 2026-06-02 14:25
  */
 public final class ConfigStrategy implements Strategy {
 

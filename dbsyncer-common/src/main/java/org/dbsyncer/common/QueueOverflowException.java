@@ -1,7 +1,7 @@
 package org.dbsyncer.common;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2023/12/04 22:39
  */

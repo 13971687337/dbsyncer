@@ -21,9 +21,9 @@ import java.util.Properties;
 /**
  * 关系型数据库连接配置校验器
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-08 15:17
+ * @Date 2026-06-02 14:25
  */
 public abstract class AbstractDataBaseConfigValidator implements ConfigValidator<AbstractDatabaseConnector, DatabaseConfig> {
 

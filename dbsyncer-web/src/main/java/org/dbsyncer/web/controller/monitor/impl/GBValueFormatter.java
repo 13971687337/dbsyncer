@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-21 00:29
+ * @Date 2026-06-02 14:25
  */
 @Service
 public final class GBValueFormatter implements ValueFormatter<Object, BigDecimal> {

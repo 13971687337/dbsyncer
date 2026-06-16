@@ -10,7 +10,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import java.util.concurrent.RejectedExecutionHandler;
 
 /**
- * @author yjwang
+ * @author zhangxl
  * @date 2022/4/29 10:27
  */
 @Configuration

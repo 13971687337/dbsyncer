@@ -16,9 +16,9 @@ import java.util.Properties;
 /**
  * Kafka连接器工具类
  *
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2021-12-16 23:09
+ * @Date 2026-06-02 14:25
  */
 public abstract class KafkaUtil {
 

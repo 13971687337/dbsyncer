@@ -5,7 +5,7 @@ import org.dbsyncer.common.util.StringUtil;
 /**
  * 文件格式
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2021/2/23 23:21
  */

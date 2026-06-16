@@ -7,7 +7,7 @@ import org.dbsyncer.connector.file.config.FileConfig;
 import org.dbsyncer.sdk.connector.ConnectorInstance;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2022/5/5 23:19
  */

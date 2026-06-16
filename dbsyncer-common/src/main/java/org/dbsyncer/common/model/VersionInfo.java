@@ -7,8 +7,8 @@ package org.dbsyncer.common.model;
  * 版本信息
  *
  * @version 1.0.0
- * @Author 穿云
- * @Date 2026-01-22 00:30
+ * @Author zhangxl
+ * @Date 2026-06-02 14:25
  */
 public final class VersionInfo {
 

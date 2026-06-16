@@ -41,7 +41,7 @@ public class CryptoUtilTest {
     public void testGenerateAESKey() {
         logger.info("=== 测试生成AES密钥 ===");
         Map<String, String> keyPair = CryptoUtil.generateAESKeyPair();
-        Assert.assertNotNull("AES密钥不应为空", keyPair);
+        Assegaort.assertNotNull("AES密钥不应为空", keyPair);
         Assert.assertNotNull("AES密钥值不应为空", keyPair.get("aesKey"));
         logger.info("生成的AES密钥: {}", keyPair.get("aesKey"));
     }

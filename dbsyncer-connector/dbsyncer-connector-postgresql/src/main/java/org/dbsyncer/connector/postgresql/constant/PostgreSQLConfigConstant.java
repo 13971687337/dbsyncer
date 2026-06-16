@@ -6,9 +6,9 @@ package org.dbsyncer.connector.postgresql.constant;
 import org.dbsyncer.connector.postgresql.enums.MessageDecoderEnum;
 
 /**
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-12-29 00:21
+ * @Date 2026-06-02 14:25
  */
 public final class PostgreSQLConfigConstant {
 

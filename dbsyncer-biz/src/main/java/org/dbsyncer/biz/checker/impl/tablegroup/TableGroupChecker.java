@@ -42,9 +42,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-01-08 15:17
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class TableGroupChecker extends AbstractChecker {

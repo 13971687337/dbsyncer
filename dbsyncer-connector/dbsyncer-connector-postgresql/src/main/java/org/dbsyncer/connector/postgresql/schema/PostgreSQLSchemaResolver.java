@@ -23,9 +23,9 @@ import java.util.stream.Stream;
 /**
  * PostgreSQL标准数据类型解析器
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2025-06-25 23:01
+ * @Date 2026-06-02 14:25
  */
 public final class PostgreSQLSchemaResolver extends AbstractSchemaResolver {
     @Override

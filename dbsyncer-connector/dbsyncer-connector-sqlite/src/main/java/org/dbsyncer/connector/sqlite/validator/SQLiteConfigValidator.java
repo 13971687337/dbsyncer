@@ -16,9 +16,9 @@ import java.util.Objects;
 /**
  * SQLite连接配置校验器实现
  *
- * @Author bble
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2023-11-28 16:22
+ * @Date 2026-06-02 14:25
  */
 public class SQLiteConfigValidator extends AbstractDataBaseConfigValidator {
 

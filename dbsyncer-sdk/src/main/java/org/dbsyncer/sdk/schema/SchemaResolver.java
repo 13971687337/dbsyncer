@@ -8,9 +8,9 @@ import org.dbsyncer.sdk.model.Field;
 /**
  * 数据类型解析器
  *
- * @Author 穿云
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2024-11-25 22:48
+ * @Date 2026-06-02 14:25
  */
 public interface SchemaResolver {
 

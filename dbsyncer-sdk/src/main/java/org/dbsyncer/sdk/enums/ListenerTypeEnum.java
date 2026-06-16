@@ -3,7 +3,7 @@ package org.dbsyncer.sdk.enums;
 import org.dbsyncer.common.util.StringUtil;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/04/24 14:19
  */
