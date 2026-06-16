@@ -52,4 +52,25 @@ public class TableGroupBufferConfig extends BufferActuatorConfig {
     public void setThreadQueueCapacity(int threadQueueCapacity) {
         this.threadQueueCapacity = threadQueueCapacity;
     }
+
+    public void applyHotTableProfile() {
+        setBufferPullCount(5000);
+        setBufferQueueCapacity(100_000);
+        setBufferPeriodMillisecond(100);
+        setBufferWriterCount(200);
+    }
+
+    public void applyColdTableProfile() {
+        setBufferPullCount(100);
+        setBufferQueueCapacity(5_000);
+        setBufferPeriodMillisecond(1000);
+        setBufferWriterCount(50);
+    }
+
+    public void applyDefaultProfile() {
+        setBufferPullCount(1000);
+        setBufferQueueCapacity(30_000);
+        setBufferPeriodMillisecond(300);
+        setBufferWriterCount(100);
+    }
 }

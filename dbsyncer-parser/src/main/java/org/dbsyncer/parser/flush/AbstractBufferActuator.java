@@ -247,6 +247,10 @@ public abstract class AbstractBufferActuator<Request extends BufferRequest, Resp
         this.config = config;
     }
 
+    public void reconfig(BufferActuatorConfig newConfig) {
+        this.config = newConfig;
+    }
+
     protected int getBufferWriterCount(){
         return config.getBufferWriterCount();
     }
