@@ -17,6 +17,30 @@
       </div>
     </el-card>
 
+    <!-- 表级队列深度 -->
+    <el-card class="monitor-section" style="margin-bottom: 20px">
+      <template #header>表级队列深度 (Top 20)</template>
+      <v-chart :option="queueDepthOption" style="height: 300px" autoresize />
+    </el-card>
+
+    <!-- 事件吞吐趋势 -->
+    <el-card class="monitor-section" style="margin-bottom: 20px">
+      <template #header>事件吞吐趋势</template>
+      <v-chart :option="throughputOption" style="height: 300px" autoresize />
+    </el-card>
+
+    <!-- 错误日志 -->
+    <el-card class="monitor-section">
+      <template #header>错误日志</template>
+      <div style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px">
+        <div v-for="(log, idx) in errorLogs" :key="idx" style="padding: 4px 0; border-bottom: 1px solid #ebeef5">
+          <span style="color: #909399">{{ log.time }}</span>
+          <span style="color: #F56C6C; margin-left: 12px">{{ log.message }}</span>
+        </div>
+        <div v-if="errorLogs.length === 0" style="color: #67C23A; text-align: center; padding: 40px">暂无错误</div>
+      </div>
+    </el-card>
+
     <!-- 图表区 -->
     <el-row :gutter="16" class="chart-row">
       <el-col :span="16">
@@ -171,15 +195,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
-import { queryData, queryLog, clearData, clearLog, getMetric, syncMonitor, getHealthOverview } from '@/api/monitor'
+import { queryData, queryLog, clearData, clearLog, getMetric, syncMonitor, getHealthOverview, getTableQueueDepths, getThroughputTrend } from '@/api/monitor'
 import { searchMapping } from '@/api/mapping'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
-import { LineChart, PieChart } from 'echarts/charts'
+import { LineChart, PieChart, BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 
-use([LineChart, PieChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
+use([LineChart, PieChart, BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer])
 
 const { proxy } = getCurrentInstance() as any
 
@@ -215,6 +239,30 @@ const queueOption = ref(emptyLineOption())
 const storageOption = ref(emptyLineOption())
 const cpuOption = ref(emptyLineOption())
 const memoryOption = ref(emptyLineOption())
+
+// ECharts 仪表盘数据
+const queueDepthOption = ref({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+  xAxis: { type: 'category', data: [], axisLabel: { rotate: 45, fontSize: 10 } },
+  yAxis: { type: 'value', name: '积压(条)' },
+  series: [{ type: 'bar', data: [], itemStyle: { color: '#409EFF' } }]
+})
+
+const throughputOption = ref({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['INSERT', 'UPDATE', 'DELETE'] },
+  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+  xAxis: { type: 'category', data: Array.from({length: 60}, (_,i) => 60-i + 's前') },
+  yAxis: { type: 'value', name: 'events/s' },
+  series: [
+    { name: 'INSERT', type: 'line', data: Array(60).fill(0), smooth: true, lineStyle: { color: '#67C23A' } },
+    { name: 'UPDATE', type: 'line', data: Array(60).fill(0), smooth: true, lineStyle: { color: '#E6A23C' } },
+    { name: 'DELETE', type: 'line', data: Array(60).fill(0), smooth: true, lineStyle: { color: '#F56C6C' } }
+  ]
+})
+
+const errorLogs = ref<{ time: string; message: string }[]>([])
 
 async function loadData() {
   dataLoading.value = true
@@ -292,12 +340,17 @@ onMounted(() => {
   loadMetric()
   loadMetaList()
   loadHealth()
+  loadQueueDepth()
+  loadThroughput()
 })
 
-// 每5秒自动刷新健康状态
+// 每10秒自动刷新健康状态和仪表盘数据
 const healthTimer = setInterval(() => {
   loadHealth()
-}, 5000)
+  loadQueueDepth()
+  loadThroughput()
+  loadErrorLogs()
+}, 10000)
 
 onUnmounted(() => {
   clearInterval(healthTimer)
@@ -316,6 +369,39 @@ async function loadHealth() {
   } catch (e) {
     // silent
   }
+}
+
+async function loadQueueDepth() {
+  try {
+    const res: any = await getTableQueueDepths()
+    const data: Record<string, number> = res?.data || {}
+    const entries: [string, number][] = Object.entries(data)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+    ;(queueDepthOption.value.xAxis as any).data = entries.map(e => e[0])
+    ;(queueDepthOption.value.series[0] as any).data = entries.map(e => e[1])
+  } catch { /* ignore */ }
+}
+
+async function loadThroughput() {
+  try {
+    // 取第一个驱动作为默认选择
+    const id = actuatorMetaId.value || metaList.value[0]?.id
+    if (!id) return
+    const res: any = await getThroughputTrend(id)
+    const data = res?.data || {}
+    if (data.inserts) throughputOption.value.series[0].data = data.inserts.slice(-60)
+    if (data.updates) throughputOption.value.series[1].data = data.updates.slice(-60)
+    if (data.deletes) throughputOption.value.series[2].data = data.deletes.slice(-60)
+  } catch { /* ignore */ }
+}
+
+function loadErrorLogs() {
+  // 从已有日志中筛选错误
+  errorLogs.value = (logData.value || [])
+    .filter((l: any) => l.message && (l.message.includes('ERROR') || l.message.includes('异常') || l.message.includes('失败')))
+    .slice(0, 50)
+    .map((l: any) => ({ time: l.createTime || '', message: l.message }))
 }
 </script>
 
