@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
@@ -150,11 +149,7 @@ public class MySQLListener extends AbstractDatabaseListener {
                     sendChangedEvent(event);
                     break;
                 } catch (QueueOverflowException e) {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(1);
-                    } catch (InterruptedException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
+                    backpressureWait();
                 }
             }
         } catch (Exception e) {

@@ -276,11 +276,7 @@ public class SqlServerListener extends AbstractDatabaseListener {
                 sendChangedEvent(event);
                 break;
             } catch (QueueOverflowException ex) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(1);
-                } catch (InterruptedException exe) {
-                    logger.error(exe.getMessage(), exe);
-                }
+                backpressureWait();
             }
         }
     }

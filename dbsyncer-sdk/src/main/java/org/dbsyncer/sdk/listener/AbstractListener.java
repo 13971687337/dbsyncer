@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @version 1.0.0
@@ -120,6 +121,14 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
     @Override
     public void errorEvent(Exception e) {
         watcher.errorEvent(e);
+    }
+
+    /**
+     * 队列满时退避等待，避免 busy-spin。使用 LockSupport.parkNanos(100μs) 替代 Thread.sleep(1ms)，
+     * 在高频队列满的场景下可减少上下文切换开销并将精度控制在微秒级。
+     */
+    protected void backpressureWait() {
+        LockSupport.parkNanos(100_000);
     }
 
     protected void sleepInMills(long timeout) {

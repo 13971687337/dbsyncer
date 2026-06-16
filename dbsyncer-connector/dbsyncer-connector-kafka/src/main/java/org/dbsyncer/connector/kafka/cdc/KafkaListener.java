@@ -171,11 +171,7 @@ public class KafkaListener extends AbstractListener<KafkaConnectorInstance> {
                     changeEvent(event);
                     break;
                 } catch (QueueOverflowException e) {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(1);
-                    } catch (InterruptedException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
+                    backpressureWait();
                 }
             }
         } catch (Exception e) {

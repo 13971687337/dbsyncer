@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @Author zhangxl
  * @Version 1.0.0
@@ -88,11 +86,7 @@ public class OracleListener extends AbstractDatabaseListener {
                     sendChangedEvent(event);
                     break;
                 } catch (QueueOverflowException e) {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(1);
-                    } catch (InterruptedException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
+                    backpressureWait();
                 }
             }
         } catch (Exception e) {
