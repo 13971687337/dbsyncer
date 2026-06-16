@@ -33,6 +33,7 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -208,6 +209,24 @@ public class MonitorController extends BaseController {
             logger.error(e.getLocalizedMessage(), e);
             return RestResult.restFail(e.getMessage());
         }
+    }
+
+    @GetMapping("/health/overview")
+    @ResponseBody
+    public Map<String, String> getHealthOverview() {
+        return monitorService.getHealthOverview();
+    }
+
+    @GetMapping("/metrics/tableQueues")
+    @ResponseBody
+    public Map<String, Long> getTableQueueDepths() {
+        return monitorService.getTableQueueDepths();
+    }
+
+    @GetMapping("/metrics/throughput/{metaId}")
+    @ResponseBody
+    public List<Map<String, Object>> getThroughputTrend(@PathVariable String metaId) {
+        return monitorService.getThroughputTrend(metaId);
     }
 
     private void collectCpu() {

@@ -6,7 +6,7 @@ import org.dbsyncer.common.util.StringUtil;
 /**
  * 系统指标
  *
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2021/07/22 19:19
  */
@@ -50,7 +50,57 @@ public enum MetricEnum {
     /**
      * 系统环境
      */
-    SYSTEM_ENV("system.info", "运行环境", "");
+    SYSTEM_ENV("system.info", "运行环境", ""),
+
+    /**
+     * Binlog延迟(字节)
+     */
+    BINLOG_LAG_BYTES("binlogLagBytes", "同步", "Binlog延迟(字节)"),
+
+    /**
+     * 每秒事件数
+     */
+    EVENTS_PER_SECOND("eventsPerSecond", "同步", "每秒事件数"),
+
+    /**
+     * 每秒写入行数
+     */
+    WRITE_ROWS_PER_SECOND("writeRowsPerSecond", "同步", "每秒写入行数"),
+
+    /**
+     * 累计写入失败数
+     */
+    WRITE_ERROR_COUNT("writeErrorCount", "同步", "累计写入失败数"),
+
+    /**
+     * 队列积压
+     */
+    TABLE_QUEUE_DEPTH("tableQueueDepth", "表", "队列积压"),
+
+    /**
+     * 写入延迟(ms)
+     */
+    TABLE_WRITE_LATENCY("tableWriteLatency", "表", "写入延迟(ms)"),
+
+    /**
+     * 最近事件时间
+     */
+    TABLE_LAST_EVENT_TIME("tableLastEventTime", "表", "最近事件时间"),
+
+    /**
+     * JVM堆内存(MB)
+     */
+    HEAP_USED_MB("heapUsedMb", "JVM", "堆内存(MB)"),
+
+    /**
+     * 活跃执行器数
+     */
+    ACTUATOR_COUNT_ACTIVE("actuatorCountActive", "执行器", "活跃执行器数"),
+
+    /**
+     * 监听器状态
+     */
+    LISTENER_STATUS("listenerStatus", "监听器", "监听器状态");
 
     private final String code;
     private final String group;

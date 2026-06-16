@@ -1,5 +1,22 @@
 <template>
   <div class="monitor">
+    <!-- 健康概览 -->
+    <el-card class="health-overview" style="margin-bottom: 20px">
+      <template #header>
+        <span>同步健康概览</span>
+      </template>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap">
+        <div v-for="(status, metaId) in healthMap" :key="metaId"
+             style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #e4e7ed; border-radius: 8px">
+          <span :style="{ width: '12px', height: '12px', borderRadius: '50%', display: 'inline-block', background: statusColor(status) }" />
+          <span style="font-size: 14px">{{ mappingNames[metaId] || metaId }}</span>
+        </div>
+        <div v-if="Object.keys(healthMap).length === 0" style="color: #909399; font-size: 14px">
+          暂无运行的同步任务
+        </div>
+      </div>
+    </el-card>
+
     <!-- 图表区 -->
     <el-row :gutter="16" class="chart-row">
       <el-col :span="16">
@@ -153,8 +170,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, getCurrentInstance } from 'vue'
-import { queryData, queryLog, clearData, clearLog, getMetric, syncMonitor } from '@/api/monitor'
+import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
+import { queryData, queryLog, clearData, clearLog, getMetric, syncMonitor, getHealthOverview } from '@/api/monitor'
 import { searchMapping } from '@/api/mapping'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
@@ -179,6 +196,14 @@ const cpuPercent = ref(0)
 const memoryPercent = ref(0)
 const diskPercent = ref(0)
 const metrics = ref<{ label: string; value: string }[]>([])
+
+const healthMap = ref<Record<string, string>>({})
+const mappingNames = ref<Record<string, string>>({})
+
+const statusColor = (s: string) => {
+  const colors: Record<string, string> = { green: '#67C23A', yellow: '#E6A23C', red: '#F56C6C', gray: '#909399' }
+  return colors[s] || '#909399'
+}
 
 const emptyLineOption = (): any => ({
   xAxis: { type: 'category', data: [] },
@@ -266,7 +291,32 @@ onMounted(() => {
   loadLog()
   loadMetric()
   loadMetaList()
+  loadHealth()
 })
+
+// 每5秒自动刷新健康状态
+const healthTimer = setInterval(() => {
+  loadHealth()
+}, 5000)
+
+onUnmounted(() => {
+  clearInterval(healthTimer)
+})
+
+async function loadHealth() {
+  try {
+    const res: any = await getHealthOverview()
+    healthMap.value = res?.data || {}
+    // 用 metaList 填充 mappingNames
+    if (metaList.value.length > 0) {
+      for (const m of metaList.value) {
+        mappingNames.value[m.id] = m.mappingName
+      }
+    }
+  } catch (e) {
+    // silent
+  }
+}
 </script>
 
 <style scoped>

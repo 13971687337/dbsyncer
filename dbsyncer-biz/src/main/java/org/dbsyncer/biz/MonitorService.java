@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author AE86
+ * @author zhangxl
  * @version 1.0.0
  * @date 2020/1/14 0:02
  */
@@ -106,4 +106,26 @@ public interface MonitorService {
      * @return
      */
     Paging<MetricResponse> queryActuator(Map<String, String> params);
+
+    /**
+     * 获取所有 Mapping 的健康概览（绿/黄/红/灰）
+     *
+     * @return metaId -> health status
+     */
+    Map<String, String> getHealthOverview();
+
+    /**
+     * 获取表级队列深度
+     *
+     * @return tableName -> queue depth
+     */
+    Map<String, Long> getTableQueueDepths();
+
+    /**
+     * 获取近 1 小时事件吞吐趋势
+     *
+     * @param metaId 驱动ID
+     * @return 时间序列数据
+     */
+    List<Map<String, Object>> getThroughputTrend(String metaId);
 }

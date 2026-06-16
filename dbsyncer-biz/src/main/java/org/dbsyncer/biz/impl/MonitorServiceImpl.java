@@ -58,15 +58,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-04-27 10:20
+ * @Date 2026-06-02 14:25
  */
 @Service
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService, ScheduledTaskJob {
@@ -243,6 +244,37 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
         String metaId = params.get(ConfigConstant.CONFIG_MODEL_ID);
         String name = params.get(ConfigConstant.CONFIG_MODEL_NAME);
         return metricReporter.queryActuator(metaId, name, pageNum, pageSize);
+    }
+
+    @Override
+    public Map<String, String> getHealthOverview() {
+        Map<String, String> health = new HashMap<>();
+        List<Meta> metas = profileComponent.getMetaAll();
+        for (Meta meta : metas) {
+            long lastEvent = metricReporter.getLastEventTime(meta.getId());
+            String status;
+            if (lastEvent == 0) {
+                status = "gray";
+            } else if (System.currentTimeMillis() - lastEvent > 60_000) {
+                status = "red";
+            } else if (System.currentTimeMillis() - lastEvent > 10_000) {
+                status = "yellow";
+            } else {
+                status = "green";
+            }
+            health.put(meta.getId(), status);
+        }
+        return health;
+    }
+
+    @Override
+    public Map<String, Long> getTableQueueDepths() {
+        return metricReporter.getTableQueueDepths();
+    }
+
+    @Override
+    public List<Map<String, Object>> getThroughputTrend(String metaId) {
+        return metricReporter.getThroughputHistory(metaId);
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.dbsyncer.common.scheduled.ScheduledTaskJob;
 import org.dbsyncer.common.scheduled.ScheduledTaskService;
 import org.dbsyncer.common.util.CollectionUtils;
 import org.dbsyncer.common.util.DateFormatUtil;
+import org.dbsyncer.common.util.SlidingWindow;
 import org.dbsyncer.common.util.StringUtil;
 import org.dbsyncer.parser.ProfileComponent;
 import org.dbsyncer.parser.enums.MetaEnum;
@@ -47,6 +48,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -54,9 +56,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @Author AE86
+ * @Author zhangxl
  * @Version 1.0.0
- * @Date 2020-04-23 11:30
+ * @Date 2026-06-02 14:25
  */
 @Component
 public class MetricReporter implements ScheduledTaskJob {
@@ -93,6 +95,13 @@ public class MetricReporter implements ScheduledTaskJob {
     private final AppReportMetric report = new AppReportMetric();
 
     private final static int SHOW_REPORT_DAYS = 30;
+
+    // 内置监控：业务指标采集
+    private final Map<String, SlidingWindow> eventsPerSecWindows = new ConcurrentHashMap<>();
+    private final Map<String, SlidingWindow> writeRowsPerSecWindows = new ConcurrentHashMap<>();
+    private final Map<String, AtomicLong> writeErrorCounters = new ConcurrentHashMap<>();
+    private final Map<String, AtomicLong> lastEventTimes = new ConcurrentHashMap<>();
+    private final Map<String, Long> writeLatencies = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init() {
@@ -165,6 +174,39 @@ public class MetricReporter implements ScheduledTaskJob {
     public DashboardMetric getMappingReportMetric() {
         queryTime = LocalDateTime.now();
         return dashboardMetric;
+    }
+
+    public void recordEvent(String metaId, String eventType) {
+        eventsPerSecWindows.computeIfAbsent(metaId, k -> new SlidingWindow(60)).add(1);
+    }
+
+    public void recordWrite(String metaId, String tableName, int rows, long latencyMs) {
+        writeRowsPerSecWindows.computeIfAbsent(metaId, k -> new SlidingWindow(60)).add(rows);
+        lastEventTimes.put(tableName, new AtomicLong(System.currentTimeMillis()));
+        writeLatencies.merge(tableName, latencyMs, (old, v) -> (old + v) / 2);
+    }
+
+    public void recordError(String metaId) {
+        writeErrorCounters.computeIfAbsent(metaId, k -> new AtomicLong()).incrementAndGet();
+    }
+
+    public long getLastEventTime(String metaId) {
+        AtomicLong t = lastEventTimes.get(metaId);
+        return t != null ? t.get() : 0;
+    }
+
+    public Map<String, Long> getTableQueueDepths() {
+        Map<String, Long> depths = new HashMap<>();
+        if (bufferActuatorRouter != null) {
+            bufferActuatorRouter.getRouter().forEach((metaId, processors) ->
+                processors.forEach((tableName, actuator) ->
+                    depths.put(tableName, (long) actuator.getQueue().size())));
+        }
+        return depths;
+    }
+
+    public List<Map<String, Object>> getThroughputHistory(String metaId) {
+        return new ArrayList<>();
     }
 
     @Override

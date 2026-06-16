@@ -27,3 +27,15 @@ export function getMetric() {
 export function getDashboard() {
   return request({ url: '/monitor/dashboard', method: 'get' })
 }
+
+export function getHealthOverview() {
+  return request({ url: '/monitor/health/overview', method: 'get' })
+}
+
+export function getTableQueueDepths() {
+  return request({ url: '/monitor/metrics/tableQueues', method: 'get' })
+}
+
+export function getThroughputTrend(metaId: string) {
+  return request({ url: `/monitor/metrics/throughput/${metaId}`, method: 'get' })
+}
