@@ -3,7 +3,7 @@
  */
 package org.dbsyncer.manager.impl;
 
-import org.dbsyncer.biz.impl.MetricReporter;
+
 import org.dbsyncer.common.scheduled.ScheduledTaskJob;
 import org.dbsyncer.common.scheduled.ScheduledTaskService;
 import org.dbsyncer.connector.base.ConnectorFactory;
@@ -89,8 +89,6 @@ public final class IncrementPuller extends AbstractPuller implements Application
     @Resource
     private LogService logService;
 
-    @Resource
-    private MetricReporter metricReporter;
 
     @Resource
     private TableGroupContext tableGroupContext;
@@ -243,7 +241,7 @@ public final class IncrementPuller extends AbstractPuller implements Application
         if (null == listener) {
             throw new ManagerException(String.format("Unsupported listener type \"%s\".", connectorConfig.getConnectorType()));
         }
-        listener.register(new ParserConsumer(bufferActuatorRouter, profileComponent, pluginFactory, logService, metricReporter::recordEvent, meta.getId(), list));
+        listener.register(new ParserConsumer(bufferActuatorRouter, profileComponent, pluginFactory, logService, (metaId, event) -> {}, meta.getId(), list));
 
         // 默认定时抽取
         if (ListenerTypeEnum.isTiming(listenerType) && listener instanceof AbstractQuartzListener) {
