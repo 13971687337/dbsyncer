@@ -7,6 +7,8 @@ import org.dbsyncer.biz.impl.MetricReporter;
 import org.dbsyncer.common.scheduled.ScheduledTaskJob;
 import org.dbsyncer.common.scheduled.ScheduledTaskService;
 import org.dbsyncer.connector.base.ConnectorFactory;
+import org.dbsyncer.connector.mysql.cdc.MySQLListener;
+import org.dbsyncer.connector.mysql.cdc.SharedBinlogConsumer;
 import org.dbsyncer.manager.AbstractPuller;
 import org.dbsyncer.manager.ManagerException;
 import org.dbsyncer.parser.LogService;
@@ -24,6 +26,7 @@ import org.dbsyncer.parser.model.TableGroup;
 import org.dbsyncer.parser.util.ConnectorInstanceUtil;
 import org.dbsyncer.parser.util.PickerUtil;
 import org.dbsyncer.plugin.PluginFactory;
+import org.dbsyncer.sdk.config.DatabaseConfig;
 import org.dbsyncer.sdk.config.ListenerConfig;
 import org.dbsyncer.sdk.constant.ConnectorConstant;
 import org.dbsyncer.sdk.enums.ListenerTypeEnum;
@@ -109,17 +112,51 @@ public final class IncrementPuller extends AbstractPuller implements Application
         Meta meta = profileComponent.getMeta(metaId);
         Assert.notNull(meta, "Meta不能为空.");
 
+        // 检测MySQL共享binlog模式：同一源 host:port/database 的多个Mapping复用单条binlog连接
+        final SharedBinlogConsumer sharedConsumer = buildSharedBinlogConsumer(connector, mapping);
+
         Thread worker = new Thread(() -> {
             try {
-                map.computeIfAbsent(metaId, k -> {
+                // 使用compute代替computeIfAbsent，以便区分「新建」和「已存在」
+                final boolean[] isNew = {false};
+                Listener listener = map.compute(metaId, (k, existing) -> {
+                    if (existing != null) {
+                        return existing;
+                    }
+                    isNew[0] = true;
                     logger.info("开始增量同步：{}, {}", metaId, mapping.getName());
                     long now = Instant.now().toEpochMilli();
                     meta.setBeginTime(now);
                     meta.setEndTime(now);
                     profileComponent.editConfigModel(meta);
                     tableGroupContext.put(mapping, list);
-                    return getListener(mapping, connector, targetConnector, list, meta);
-                }).start();
+                    Listener l = getListener(mapping, connector, targetConnector, list, meta);
+
+                    // 配置MySQL共享binlog消费者（仅新建Listener时）
+                    if (sharedConsumer != null && l instanceof MySQLListener) {
+                        MySQLListener mysqlListener = (MySQLListener) l;
+                        mysqlListener.setSharedBinlogConsumer(sharedConsumer);
+
+                        // 贡献本Mapping的快照位点，取所有Mapping的最小位点作为启动位点
+                        Map<String, String> snapshot = meta.getSnapshot();
+                        if (snapshot != null && snapshot.containsKey("fileName")) {
+                            long pos = snapshot.containsKey("position")
+                                    ? Long.parseLong(snapshot.get("position")) : 0;
+                            sharedConsumer.setStartupSnapshot(snapshot.get("fileName"), pos);
+                        }
+                    }
+
+                    return l;
+                });
+
+                if (listener != null) {
+                    listener.start();
+                }
+
+                // 共享消费者统一启动（仅新建Listener时调用；synchronized + started标记保证只连接一次）
+                if (isNew[0] && sharedConsumer != null && !sharedConsumer.isStarted()) {
+                    sharedConsumer.start();
+                }
             } catch (Exception e) {
                 close(metaId);
                 logService.log(LogType.TableGroupLog.INCREMENT_FAILED, String.format("启动驱动失败：[%s], %s", mapping.getName(), e.getMessage()));
@@ -129,6 +166,28 @@ public final class IncrementPuller extends AbstractPuller implements Application
         worker.setName("increment-worker-" + mapping.getId());
         worker.setDaemon(false);
         worker.start();
+    }
+
+    /**
+     * 为MySQL源构建共享Binlog消费者。
+     * <p>当源连接器类型为MySQL时，创建或获取对应的 SharedBinlogConsumer 实例，
+     * 使得指向同一 host:port/database 的多个Mapping共享单条binlog连接。</p>
+     *
+     * @param connector 源连接器
+     * @param mapping   当前Mapping
+     * @return SharedBinlogConsumer实例，非MySQL源返回null
+     */
+    private SharedBinlogConsumer buildSharedBinlogConsumer(Connector connector, Mapping mapping) {
+        ConnectorConfig connectorConfig = connector.getConfig();
+        if ("MySQL".equals(connectorConfig.getConnectorType()) && connectorConfig instanceof DatabaseConfig) {
+            DatabaseConfig dbConfig = (DatabaseConfig) connectorConfig;
+            return SharedBinlogConsumer.getOrCreate(
+                    dbConfig.getHost(), dbConfig.getPort(),
+                    dbConfig.getUsername(), dbConfig.getPassword(),
+                    mapping.getSourceDatabase()
+            );
+        }
+        return null;
     }
 
     @Override

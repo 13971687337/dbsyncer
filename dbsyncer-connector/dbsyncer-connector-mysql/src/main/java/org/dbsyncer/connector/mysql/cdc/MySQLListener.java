@@ -60,9 +60,25 @@ public class MySQLListener extends AbstractDatabaseListener {
 
     private final String BINLOG_FILENAME = "fileName";
     private final String BINLOG_POSITION = "position";
-    private final Map<Long, TableMapEventData> tables = new HashMap<>();
+    private Map<Long, TableMapEventData> tables = new HashMap<>();
     private BinaryLogClient client;
     private final Lock connectLock = new ReentrantLock();
+
+    /** 是否使用共享Binlog消费者（多Mapping复用单连接） */
+    private boolean useSharedConsumer = false;
+    private SharedBinlogConsumer sharedConsumer;
+    /** 关闭标记，供InnerEventListener在共享模式下检查是否需要丢弃事件 */
+    private volatile boolean closed = false;
+
+    /**
+     * 设置使用共享Binlog消费者（多Mapping复用单连接模式）。
+     *
+     * @param sharedConsumer 共享消费者实例
+     */
+    public void setSharedBinlogConsumer(SharedBinlogConsumer sharedConsumer) {
+        this.useSharedConsumer = true;
+        this.sharedConsumer = sharedConsumer;
+    }
 
     @Override
     public void start() {
@@ -72,7 +88,11 @@ public class MySQLListener extends AbstractDatabaseListener {
                 logger.error("MySQLExtractor is already started");
                 return;
             }
-            run();
+            if (useSharedConsumer) {
+                runShared();
+            } else {
+                run();
+            }
         } catch (Exception e) {
             logger.error("启动失败:{}", e.getMessage());
             throw new MySQLException(e);
@@ -85,8 +105,14 @@ public class MySQLListener extends AbstractDatabaseListener {
     public void close() {
         try {
             connectLock.lock();
-            if (client != null && client.isConnected()) {
-                client.disconnect();
+            closed = true;
+            if (useSharedConsumer) {
+                sharedConsumer.unregister(metaId);
+                client = null;
+            } else {
+                if (client != null && client.isConnected()) {
+                    client.disconnect();
+                }
             }
         } catch (Exception e) {
             logger.error("关闭失败:{}", e.getMessage());
@@ -116,9 +142,35 @@ public class MySQLListener extends AbstractDatabaseListener {
 
         client.connect();
 
-        if (!containsPos) {
+        // 兼容新旧模式：onConnect中已处理首次快照写入（共享模式需要），
+        // 此处仅当onConnect未触发快照写入时作为后备
+        if (!containsPos && !snapshot.containsKey(BINLOG_POSITION)) {
             refreshSnapshot(client.getBinlogFilename(), client.getBinlogPosition());
             super.forceFlushEvent();
+        }
+    }
+
+    /**
+     * 共享模式启动：使用SharedBinlogConsumer的共享连接，注册本Mapping的
+     * EventListener/LifecycleListener即可，实际连接由SharedBinlogConsumer管理。
+     */
+    private void runShared() {
+        // 使用共享consumer的client和tableMap
+        client = sharedConsumer.getClient();
+        // 重定向tableMap到共享消费者维护的共享引用（所有Mapping共用）
+        tables = sharedConsumer.getTableMapEventByTableId();
+        // 在共享连接上注册本Mapping的监听器
+        client.registerEventListener(new InnerEventListener());
+        client.registerLifecycleListener(new InnerLifecycleListener());
+        closed = false;
+        logger.info("MySQLListener以共享模式启动: metaId={}, sharedKey={}", metaId, sharedConsumer.getKey());
+
+        // 中途加入（MID-STREAM JOIN）：共享连接已启动，onConnect不会再次触发，
+        // 此时需要立即记录当前binlog位点为该Mapping的初始快照
+        if (sharedConsumer.isStarted() && !snapshot.containsKey(BINLOG_POSITION)) {
+            refreshSnapshot(client.getBinlogFilename(), client.getBinlogPosition());
+            forceFlushEvent();
+            logger.info("中途加入共享连接，已记录初始位点: metaId={}, pos={}", metaId, client.getBinlogPosition());
         }
     }
 
@@ -163,6 +215,11 @@ public class MySQLListener extends AbstractDatabaseListener {
         public void onConnect(BinaryLogRemoteClient client) {
             // 记录binlog增量点
             refresh(client.getBinlogFilename(), client.getBinlogPosition());
+            // 首次连接/共享模式下首次收到连接事件时，记录初始位点快照
+            if (!snapshot.containsKey(BINLOG_POSITION)) {
+                refreshSnapshot(client.getBinlogFilename(), client.getBinlogPosition());
+                forceFlushEvent();
+            }
         }
 
         @Override
@@ -196,6 +253,10 @@ public class MySQLListener extends AbstractDatabaseListener {
 
         @Override
         public void onEvent(Event event) {
+            // 共享模式下已关闭则丢弃事件（CopyOnWriteArrayList不支持按需移除监听器）
+            if (closed) {
+                return;
+            }
             // ROTATE > FORMAT_DESCRIPTION > TABLE_MAP > WRITE_ROWS > UPDATE_ROWS > DELETE_ROWS > XID
             EventHeader header = event.getHeader();
             if (header.getEventType() == EventType.XID) {
