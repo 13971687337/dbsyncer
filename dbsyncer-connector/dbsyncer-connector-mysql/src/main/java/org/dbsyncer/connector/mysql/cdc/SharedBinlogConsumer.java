@@ -222,6 +222,21 @@ public class SharedBinlogConsumer {
     }
 
     /**
+     * JVM关闭时清理所有共享消费者实例
+     */
+    public static void shutdownAll() {
+        INSTANCES.forEach((key, consumer) -> {
+            try {
+                consumer.close();
+                consumer.logger.info("SharedBinlogConsumer已关闭: {}", key);
+            } catch (Exception e) {
+                consumer.logger.error("关闭SharedBinlogConsumer失败: {}", key, e);
+            }
+        });
+        INSTANCES.clear();
+    }
+
+    /**
      * Mapping注册句柄。
      */
     private static class MappingHandle {

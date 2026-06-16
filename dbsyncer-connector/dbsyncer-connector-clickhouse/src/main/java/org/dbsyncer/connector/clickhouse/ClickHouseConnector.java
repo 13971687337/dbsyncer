@@ -288,7 +288,8 @@ public final class ClickHouseConnector extends AbstractDatabaseConnector {
         if (StringUtil.isNotBlank(database)) {
             url.append("/").append(database);
         }
-        url.append("?async_insert=1&wait_for_async_insert=1");
+        String connector = url.toString().contains("?") ? "&" : "?";
+        url.append(connector).append("async_insert=1&wait_for_async_insert=1");
         return url.toString();
     }
 }

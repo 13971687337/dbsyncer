@@ -1,4 +1,4 @@
-<template>
+检查<template>
   <div class="monitor">
     <!-- 健康概览 -->
     <el-card class="health-overview" style="margin-bottom: 20px">
@@ -272,14 +272,14 @@ async function loadData() {
       dataItems.value = res.data.data || []
       dataTotal.value = res.data.total || 0
     }
-  } catch { /* ignore */ } finally { dataLoading.value = false }
+  } catch (e) { console.error('MonitorView: loadData failed', e) } finally { dataLoading.value = false }
 }
 
 async function loadLog() {
   try {
     const res: any = await queryLog({ pageNum: 1, pageSize: 50 })
     if (res?.data) logData.value = res.data.data || []
-  } catch { /* ignore */ }
+  } catch (e) { console.error('MonitorView: loadLog failed', e) }
 }
 
 async function loadMetric() {
@@ -297,14 +297,14 @@ async function loadMetric() {
         { label: '磁盘总量', value: (d.disk?.total || '--') + ' GB' },
       ]
     }
-  } catch { /* ignore */ }
+  } catch (e) { console.error('MonitorView: loadMetric failed', e) }
 }
 
 async function loadMetaList() {
   try {
     const res: any = await searchMapping({ pageNum: 1, pageSize: 100 })
     if (res?.data) metaList.value = res.data.data || []
-  } catch { /* ignore */ }
+  } catch (e) { console.error('MonitorView: loadMetaList failed', e) }
 }
 
 function handleClearLog() {
@@ -367,7 +367,7 @@ async function loadHealth() {
       }
     }
   } catch (e) {
-    // silent
+    console.error('MonitorView: loadHealth failed', e)
   }
 }
 
@@ -380,7 +380,7 @@ async function loadQueueDepth() {
       .slice(0, 20)
     ;(queueDepthOption.value.xAxis as any).data = entries.map(e => e[0])
     ;(queueDepthOption.value.series[0] as any).data = entries.map(e => e[1])
-  } catch { /* ignore */ }
+  } catch (e) { console.error('MonitorView: loadQueueDepth failed', e) }
 }
 
 async function loadThroughput() {
@@ -393,7 +393,7 @@ async function loadThroughput() {
     if (data.inserts) throughputOption.value.series[0].data = data.inserts.slice(-60)
     if (data.updates) throughputOption.value.series[1].data = data.updates.slice(-60)
     if (data.deletes) throughputOption.value.series[2].data = data.deletes.slice(-60)
-  } catch { /* ignore */ }
+  } catch (e) { console.error('MonitorView: loadThroughput failed', e) }
 }
 
 function loadErrorLogs() {

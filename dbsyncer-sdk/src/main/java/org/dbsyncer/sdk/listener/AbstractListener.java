@@ -123,12 +123,19 @@ public abstract class AbstractListener<C extends ConnectorInstance> implements L
         watcher.errorEvent(e);
     }
 
+    private int spinCounter = 0;
+    private static final int MAX_SPIN_COUNT = 100;
+
     /**
      * 队列满时退避等待，避免 busy-spin。使用 LockSupport.parkNanos(100μs) 替代 Thread.sleep(1ms)，
      * 在高频队列满的场景下可减少上下文切换开销并将精度控制在微秒级。
      */
     protected void backpressureWait() {
         LockSupport.parkNanos(100_000);
+        if (++spinCounter > MAX_SPIN_COUNT) {
+            Thread.yield();
+            spinCounter = 0;
+        }
     }
 
     protected void sleepInMills(long timeout) {
